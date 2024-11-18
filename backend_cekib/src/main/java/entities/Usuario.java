@@ -2,38 +2,31 @@ package entities;
 
 import jakarta.persistence.*;
 
-// Clase que representa la entidad Usuario
 @Entity
-@Table(name = "usuario") // Mapea la clase a la tabla 'usuario' en la base de datos
+@Table(name = "usuario")
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Genera un ID automáticamente
-    private Long id; // ID del usuario
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuario")
+    private Integer idUsuario;
 
-    @Column(nullable = false, unique = true) // Asegura que el nombre de usuario sea único
+    @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(nullable = false) // La contraseña no puede ser nula
+    @Column(name = "password", nullable = false)
     private String password;
 
-    // Constructor vacío requerido por JPA
-    public Usuario() {
-    }
-
-    // Constructor que recibe username y password
-    public Usuario(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
+    @Column(name = "tipo_usuario", nullable = false)
+    private String tipoUsuario;
 
     // Getters y Setters
-    public Long getId() {
-        return id;
+    public Integer getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdUsuario(Integer idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getUsername() {
@@ -50,5 +43,13 @@ public class Usuario {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getTipoUsuario() {
+        return tipoUsuario;
+    }
+
+    public void setTipoUsuario(String tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
     }
 }
