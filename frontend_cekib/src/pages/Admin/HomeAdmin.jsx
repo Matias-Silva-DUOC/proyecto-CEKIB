@@ -38,7 +38,7 @@ export default function HomeAdmin() {
                         <div className="flex flex-wrap justify-around">
                             {profesionales.map((prof) => (
                                 <div key={prof.name} className="flex flex-col items-center m-2">
-                                    <img src={prof.image} alt={prof.name} className="rounded-full w-16 h-16 mb-2" />
+                                    <img src={prof.image} alt={`${prof.name}`} className="rounded-full w-16 h-16 mb-2" />
                                     <p className="font-semibold">{prof.name}</p>
                                     <p className="text-gray-500">{prof.job}</p>
                                 </div>
@@ -67,8 +67,8 @@ export default function HomeAdmin() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {tratamientos.map((item, index) => (
-                                    <tr key={index} className="border-t">
+                                {tratamientos.map((item) => (
+                                    <tr key={item.fecha + item.paciente} className="border-t">
                                         <td className="border p-2">{item.fecha}</td>
                                         <td className="border p-2">{item.paciente}</td>
                                         <td className="border p-2">{item.tipo}</td>

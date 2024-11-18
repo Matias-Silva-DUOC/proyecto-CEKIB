@@ -1,15 +1,14 @@
 import React from "react";
 import { Navbar, MobileNav, Typography, Button, IconButton } from "@material-tailwind/react";
-import { Link, useLocation } from 'react-router-dom'; // Importa Link y useLocation
+import { Link, useLocation } from 'react-router-dom';
 import LogoCekib from '../../assets/img/logo.png';
 import { BsClock } from "react-icons/bs";
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 
 export function StickyNavbar() {
   const [openNav, setOpenNav] = React.useState(false);
-  const location = useLocation(); // Obtiene la ubicación actual
-
-  // Establece el nombre de la pestaña seleccionada según la ruta actual
+  const location = useLocation();
+  
   const selectedNav = location.pathname === "/nosotros" ? "¿Quiénes Somos?" :
                       location.pathname === "/servicios" ? "Nuestros Servicios" :
                       location.pathname === "/blog" ? "Blog" :
@@ -52,7 +51,7 @@ export function StickyNavbar() {
             <img
               src={LogoCekib}
               alt="Logo CEKIB"
-              className="w-36 inline-block"
+              className="w-32 inline-block"
             />
           </Typography>
           <div className="flex items-center justify-center flex-grow">

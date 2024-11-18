@@ -6,7 +6,11 @@ import Home from './pages/Home';
 import Nosotros from './pages/Nosotros';
 import Contacto from './pages/Contacto';
 import Servicios from './pages/Servicios';
-import AgendarHora from './pages/AgendarHora';
+import AgendarHora from './pages/Horas/AgendarHora';
+import ConsultarHora from './pages/Horas/ConsultarHora';
+import ConfirmarHora from './pages/Horas/ConfirmarHora';
+import AnularHora from './pages/Horas/AnularHora';
+import CambiarHora from './pages/Horas/CambiarHora';
 import Login from './pages/Login';
 import HomeAdmin from './pages/Admin/HomeAdmin';
 import Dashboard from './pages/Admin/Dashboard';
@@ -27,7 +31,15 @@ function App() {
         <Route path='/nosotros' element={<Nosotros />} />
         <Route path='/contacto' element={<Contacto />} />
         <Route path='/servicios' element={<Servicios />} />
+
+        {/* Horas Routes */}
         <Route path='/agendarhora' element={<AgendarHora />} />
+        <Route path='/consultarhora' element={<ConsultarHora />} />
+        <Route path='/confirmarhora' element={<ConfirmarHora />} />
+        <Route path='/anularhora' element={<AnularHora />} />
+        <Route path='/cambiarhora' element={<CambiarHora />} />
+
+        {/* Login Route */}
         <Route path='/login' element={<Login />} />
 
         {/* Admin Routes */}
