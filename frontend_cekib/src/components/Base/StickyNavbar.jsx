@@ -1,6 +1,6 @@
 import React from "react";
 import { Navbar, MobileNav, Typography, Button, IconButton } from "@material-tailwind/react";
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogoCekib from '../../assets/img/logo.png';
 import { BsClock } from "react-icons/bs";
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
@@ -8,6 +8,7 @@ import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 export function StickyNavbar() {
   const [openNav, setOpenNav] = React.useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   
   const selectedNav = location.pathname === "/nosotros" ? "¿Quiénes Somos?" :
                       location.pathname === "/servicios" ? "Nuestros Servicios" :
@@ -63,6 +64,7 @@ export function StickyNavbar() {
               variant="filled"
               size="md"
               className="hidden lg:inline-block bg-teal-400 text-white hover:bg-teal-500"
+              onClick={() => navigate("/agendarhora")}
             >
               <BsClock className="inline-block mr-2" />
               <span> Agendar hora</span>
@@ -91,7 +93,7 @@ export function StickyNavbar() {
         <MobileNav open={openNav}>
           {navList}
           <div className="flex items-center gap-x-1">
-            <Button fullWidth color="teal" variant="filled" size="sm" className="bg-teal-400 hover:bg-teal-500">
+            <Button fullWidth color="teal" variant="filled" size="sm" className="bg-teal-400 hover:bg-teal-500" onClick={() => navigate("/agendarhora")}>
               <span>Agendar Hora</span>
             </Button>
           </div>
