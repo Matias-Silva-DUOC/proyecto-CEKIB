@@ -1,11 +1,12 @@
 package entities;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
+import utils.JsonbType;
 
 @Entity
 @Table(name = "profesional")
-public class Profesional extends PanacheEntityBase {
+public class Profesional {
 
     @Id
     @Column(name = "rut_pro", nullable = false)
@@ -26,8 +27,9 @@ public class Profesional extends PanacheEntityBase {
     @Column(name = "fono_pro", nullable = false, length = 64)
     private String fonoPro;
 
-    @Column(name = "horario", length = 64)
-    private String horario;
+    @Convert(converter = JsonbType.class) // Usa el convertidor personalizado
+    @Column(name = "horario", columnDefinition = "jsonb")
+    private JsonNode horario;
 
     @Column(name = "recordatorio", length = 64)
     private String recordatorio;
@@ -38,24 +40,6 @@ public class Profesional extends PanacheEntityBase {
     @OneToOne
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", unique = true)
     private Usuario usuario;
-
-    // Constructor vacío
-    public Profesional() {}
-
-    // Constructor completo
-    public Profesional(String rutPro, String nombrePro, String apellidoPro, String especialidadPro, String correoPro,
-                       String fonoPro, String horario, String recordatorio, String tipoUsuario, Usuario usuario) {
-        this.rutPro = rutPro;
-        this.nombrePro = nombrePro;
-        this.apellidoPro = apellidoPro;
-        this.especialidadPro = especialidadPro;
-        this.correoPro = correoPro;
-        this.fonoPro = fonoPro;
-        this.horario = horario;
-        this.recordatorio = recordatorio;
-        this.tipoUsuario = tipoUsuario;
-        this.usuario = usuario;
-    }
 
     // Getters y Setters
     public String getRutPro() {
@@ -106,11 +90,11 @@ public class Profesional extends PanacheEntityBase {
         this.fonoPro = fonoPro;
     }
 
-    public String getHorario() {
+    public JsonNode getHorario() {
         return horario;
     }
 
-    public void setHorario(String horario) {
+    public void setHorario(JsonNode horario) {
         this.horario = horario;
     }
 
@@ -138,3 +122,4 @@ public class Profesional extends PanacheEntityBase {
         this.usuario = usuario;
     }
 }
+
