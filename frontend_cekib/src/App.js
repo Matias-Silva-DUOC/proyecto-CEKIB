@@ -20,6 +20,8 @@ import HomeMedico from './pages/Medica/HomeMedico';
 import FichaIngreso from './pages/Medica/FichaIngreso';
 import Consultas from './pages/Medica/Consultas';
 import Tratamientos from './pages/Medica/Tratamientos';
+import Blog from './pages/Blog'; // Página para listar publicaciones
+import BlogPost from './pages/BlogPost'; // Página para detalles de una publicación
 
 
 function App() {
@@ -53,6 +55,9 @@ function App() {
         <Route path='/fichaingreso' element={<FichaIngreso />} />
         <Route path='/consultas' element={<Consultas />} />
         <Route path='/tratamientos' element={<Tratamientos />} />
+
+        <Route path="/blog" element={<Blog />} /> {/* Ruta para lista de publicaciones */}
+        <Route path="/blog/:id" element={<BlogPost />} /> {/* Ruta para detalles de publicación */}
 
         {/* Redirect any unmatched path to the Home page */}
         <Route path="/*" element={<Navigate to="/" />} />

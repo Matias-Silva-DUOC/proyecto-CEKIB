@@ -5,7 +5,7 @@ import "react-day-picker/dist/style.css";
 import { es } from "date-fns/locale";
 import { Button } from "@material-tailwind/react";
 
-export default function AgendarCita({ rutProfesional }) {
+export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgendada }) {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
   const [horaSeleccionada, setHoraSeleccionada] = useState("");
   const [infoProfesional, setInfoProfesional] = useState(null);
@@ -63,6 +63,22 @@ export default function AgendarCita({ rutProfesional }) {
       fetchInfoProfesional();
     }
   }, [rutProfesional, fechaSeleccionada]);
+
+  const confirmarCita = () => {
+    if (fechaSeleccionada && horaSeleccionada) {
+      const nuevaCita = {
+        fecha: fechaSeleccionada.toLocaleDateString("es-ES"),
+        hora: horaSeleccionada,
+      };
+
+      setCitaAgendada(nuevaCita);
+
+      // Avanza al siguiente paso
+      setActiveStep((prevStep) => prevStep + 1);
+    } else {
+      alert("Por favor selecciona una fecha y un horario.");
+    }
+  };
 
   const generarHorarios = (inicio, fin) => {
     const horarios = [];
@@ -147,7 +163,8 @@ export default function AgendarCita({ rutProfesional }) {
               <div className="flex justify-end m-2">
                 <Button
                   color="teal"
-                  className="bg-white text-teal-400 border border-rounded border-teal-400 mb-2"
+                  className="bg-white text-teal-400 border border-teal-400 px-4 py-2 rounded-md hover:bg-teal-400 hover:text-white"
+                  onClick={confirmarCita}
                 >
                   CONFIRMAR
                 </Button>

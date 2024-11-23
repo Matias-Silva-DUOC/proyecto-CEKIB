@@ -34,6 +34,7 @@ export default function AgendarHora() {
     const [profesionales, setProfesionales] = useState([]);
     const [rutProSeleccionado, setRutProSeleccionado] = useState(null);
     const [profesionalSeleccionado, setProfesionalSeleccionado] = useState(null);
+    const [citaAgendada, setCitaAgendada] = useState(null);
 
 
 
@@ -166,6 +167,11 @@ export default function AgendarHora() {
         } catch (error) {
             console.error('Error buscando profesional:', error);
         }
+    };
+
+    const handleCitaAgendada = (cita) => {
+        setCitaAgendada(cita); // Actualiza la cita en el padre
+        console.log("Cita agendada:", cita);
     };
 
     // Avanzar
@@ -340,7 +346,11 @@ export default function AgendarHora() {
 
                             {/* Columna 2 */}
                             <div>
-                                <AgendarCita rutProfesional={rutProSeleccionado} />
+                                <AgendarCita
+                                    rutProfesional={rutProSeleccionado}
+                                    setActiveStep={setActiveStep}
+                                    setCitaAgendada={handleCitaAgendada}
+                                />
                             </div>
                         </div>
 
@@ -356,9 +366,23 @@ export default function AgendarHora() {
                         </div>
                     </div>
                 );
-
-            default:
-                return <div>Contenido para el paso {activeStep}</div>;
+            case 5:
+                return (
+                    <div>
+                        <div className="flex w-full h-full p-4">
+                        <h3 className="text-teal-400 text-base font-bold">¡Ya casi terminas! Completa tus datos y finaliza la reserva:</h3>
+                        </div>
+                        <div className="flex justify-between mt-2">
+                            <Button
+                                color="teal"
+                                className="bg-white text-teal-400 border border-rounded border-teal-400 mb-2"
+                                onClick={handlePrev}
+                            >
+                                VOLVER A ELEGIR FECHA Y DIA
+                            </Button>
+                        </div>
+                    </div>
+                )
         }
     };
 

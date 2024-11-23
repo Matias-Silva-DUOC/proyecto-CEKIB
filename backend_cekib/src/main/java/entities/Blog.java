@@ -30,7 +30,8 @@ public class Blog {
     private Usuario usuario;
 
     // Constructor vacío
-    public Blog() {}
+    public Blog() {
+    }
 
     // Constructor completo
     public Blog(String titulo, String contenido, LocalDateTime fechaBlog, byte[] foto, Usuario usuario) {
