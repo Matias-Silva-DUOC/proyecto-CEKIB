@@ -35,7 +35,25 @@ export default function AgendarHora() {
     const [rutProSeleccionado, setRutProSeleccionado] = useState(null);
     const [profesionalSeleccionado, setProfesionalSeleccionado] = useState(null);
     const [citaAgendada, setCitaAgendada] = useState(null);
+    const [formData, setFormData] = useState({
+        nombre: "",
+        apellido: "",
+        telefono: "",
+        correo: "",
+    });
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = () => {
+        console.log("Datos del paciente:", formData);
+        // Aquí podrías enviar los datos al backend o realizar cualquier acción adicional
+    };
 
 
     useEffect(() => {
@@ -369,22 +387,71 @@ export default function AgendarHora() {
             case 5:
                 return (
                     <div>
-                        <div className="flex w-full h-full p-4">
-                        <h3 className="text-teal-400 text-base font-bold">¡Ya casi terminas! Completa tus datos y finaliza la reserva:</h3>
-                        </div>
-                        <div className="flex justify-between mt-2">
-                            <Button
-                                color="teal"
-                                className="bg-white text-teal-400 border border-rounded border-teal-400 mb-2"
-                                onClick={handlePrev}
-                            >
-                                VOLVER A ELEGIR FECHA Y DIA
-                            </Button>
+                        <div className="w-1/2 text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <h3 className="text-teal-400 text-xl font-bold mb-4">
+                                ¡Ya casi terminas! Completa tus datos y finaliza la reserva:
+                            </h3>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div className="w-full">
+                                    <Input
+                                        label="Nombre del Paciente"
+                                        color="teal"
+                                        name="nombre"
+                                        value={formData.nombre}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="w-full">
+                                    <Input
+                                        label="Apellido del Paciente"
+                                        color="teal"
+                                        name="apellido"
+                                        value={formData.apellido}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="w-full">
+                                    <Input
+                                        label="Teléfono del Paciente"
+                                        type="tel"
+                                        color="teal"
+                                        name="telefono"
+                                        value={formData.telefono}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="w-full">
+                                    <Input
+                                        label="Correo del Paciente"
+                                        type="email"
+                                        color="teal"
+                                        name="correo"
+                                        value={formData.correo}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex justify-between mt-6">
+                                <Button
+                                    color="teal"
+                                    className="bg-white text-teal-400 border border-rounded border-teal-400"
+                                    onClick={handlePrev}
+                                >
+                                    VOLVER A ELEGIR FECHA Y DÍA
+                                </Button>
+                                <Button
+                                    color="teal"
+                                    className="bg-teal-400 text-white rounded"
+                                    onClick={handleSubmit}
+                                >
+                                    CONFIRMAR RESERVA
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 )
-        }
-    };
+            }
+        };
 
     return (
         <div className="flex flex-col min-h-screen">

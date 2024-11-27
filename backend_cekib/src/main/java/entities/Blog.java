@@ -15,30 +15,38 @@ public class Blog {
     @Column(name = "titulo", nullable = false, length = 64)
     private String titulo;
 
-    @Column(name = "contenido", nullable = false, length = 255)
+    @Column(name = "contenido", nullable = false, columnDefinition = "TEXT")
     private String contenido;
+
 
     @Column(name = "fecha_blog", nullable = false)
     private LocalDateTime fechaBlog;
 
-    @Lob
-    @Column(name = "foto")
-    private byte[] foto;
+    @Column(name = "image_path", length = 255)
+    private String imagePath; // Nueva columna para almacenar la ruta de la imagen
 
-    @ManyToOne
-    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
+    // Relación con usuario marcada como opcional
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", nullable = true)
     private Usuario usuario;
 
     // Constructor vacío
     public Blog() {
     }
 
-    // Constructor completo
-    public Blog(String titulo, String contenido, LocalDateTime fechaBlog, byte[] foto, Usuario usuario) {
+    // Constructor con solo campos obligatorios
+    public Blog(String titulo, String contenido, LocalDateTime fechaBlog) {
         this.titulo = titulo;
         this.contenido = contenido;
         this.fechaBlog = fechaBlog;
-        this.foto = foto;
+    }
+
+    // Constructor completo
+    public Blog(String titulo, String contenido, LocalDateTime fechaBlog, String imagePath, Usuario usuario) {
+        this.titulo = titulo;
+        this.contenido = contenido;
+        this.fechaBlog = fechaBlog;
+        this.imagePath = imagePath;
         this.usuario = usuario;
     }
 
@@ -75,12 +83,12 @@ public class Blog {
         this.fechaBlog = fechaBlog;
     }
 
-    public byte[] getFoto() {
-        return foto;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setFoto(byte[] foto) {
-        this.foto = foto;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public Usuario getUsuario() {

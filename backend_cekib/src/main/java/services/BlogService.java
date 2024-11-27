@@ -18,8 +18,8 @@ public class BlogService {
         return blogRepository.listAll();
     }
 
-    // Obtener un blog por ID
-    public Blog getBlogById(Long id) { // Cambiado de Integer a Long
+    // Obtener un blog por su ID
+    public Blog getBlogById(Long id) { // Cambiado a Long
         return blogRepository.findById(id);
     }
 
@@ -29,20 +29,21 @@ public class BlogService {
     }
 
     // Actualizar un blog existente
-    public void updateBlog(Long id, Blog updatedBlog) { // Cambiado de Integer a Long
+    public void updateBlog(Long id, Blog updatedBlog) { // Cambiado a Long
         Blog existingBlog = blogRepository.findById(id);
         if (existingBlog != null) {
+            // Actualizar los campos relevantes
             existingBlog.setTitulo(updatedBlog.getTitulo());
             existingBlog.setContenido(updatedBlog.getContenido());
             existingBlog.setFechaBlog(updatedBlog.getFechaBlog());
-            existingBlog.setFoto(updatedBlog.getFoto());
+            existingBlog.setImagePath(updatedBlog.getImagePath());
             existingBlog.setUsuario(updatedBlog.getUsuario());
-            blogRepository.persist(existingBlog);
+            // No se requiere persist si el objeto ya estÃ¡ gestionado
         }
     }
 
-    // Eliminar un blog por ID
-    public void deleteBlog(Long id) { // Cambiado de Integer a Long
+    // Eliminar un blog por su ID
+    public void deleteBlog(Long id) { // Cambiado a Long
         Blog blog = blogRepository.findById(id);
         if (blog != null) {
             blogRepository.delete(blog);

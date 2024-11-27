@@ -1,135 +1,235 @@
-import React, { useState } from 'react';
-import { FaPlus, FaPencilAlt, FaSearch } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 export function CrudBlog() {
-    const [showCheckboxes, setShowCheckboxes] = useState(false); // Estado para mostrar los checkboxes
+    const [blogs, setBlogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [editingBlog, setEditingBlog] = useState(null);
+    const [formData, setFormData] = useState({ titulo: "", contenido: "", imagen: null });
+    const [formErrors, setFormErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleDeleteClick = () => {
-        setShowCheckboxes(!showCheckboxes); // Alternar visibilidad de los checkboxes
+    const fileInputRef = useRef(null); // Ref para el campo de archivo
+
+    const API_URL = "http://localhost:8080/blog";
+
+    useEffect(() => {
+        fetchBlogs();
+    }, []);
+
+    const fetchBlogs = async () => {
+        try {
+            const response = await axios.get(API_URL);
+            const sortedBlogs = response.data.sort((a, b) => b.id_blog - a.id_blog); // Orden descendente
+            setBlogs(sortedBlogs);
+        } catch (err) {
+            setError("No se pudieron cargar los blogs.");
+        } finally {
+            setLoading(false);
+        }
     };
 
+
+    const validateForm = () => {
+        const errors = {};
+        if (!formData.titulo || formData.titulo.length > 64) {
+            errors.titulo = "El título es obligatorio y no puede superar los 64 caracteres.";
+        }
+        if (!formData.contenido) {
+            errors.contenido = "El contenido es obligatorio.";
+        }
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleFileChange = (e) => {
+        setFormData({ ...formData, imagen: e.target.files[0] });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+        setIsSubmitting(true);
+        const formDataToSend = new FormData();
+        formDataToSend.append("titulo", formData.titulo);
+        formDataToSend.append("contenido", formData.contenido);
+        if (formData.imagen) {
+            formDataToSend.append("imagen", formData.imagen);
+        }
+
+        try {
+            if (editingBlog) {
+                await axios.put(`${API_URL}/${editingBlog.id_blog}`, formDataToSend, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+            } else {
+                await axios.post(API_URL, formDataToSend, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+            }
+            fetchBlogs();
+            resetForm();
+        } catch (err) {
+            setError("Hubo un error al guardar el blog.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleEdit = (blog) => {
+        setEditingBlog(blog);
+        setFormData({ titulo: blog.titulo, contenido: blog.contenido, imagen: null });
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm("¿Estás seguro de que quieres eliminar este blog?")) {
+            try {
+                await axios.delete(`${API_URL}/${id}`);
+                setBlogs((prevBlogs) => prevBlogs.filter((blog) => blog.id_blog !== id));
+            } catch (err) {
+                setError("Hubo un error al eliminar el blog.");
+            }
+        }
+    };
+
+    const resetForm = () => {
+        setEditingBlog(null);
+        setFormData({ titulo: "", contenido: "", imagen: null });
+        setFormErrors({});
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ""; // Limpia el campo de archivo
+        }
+    };
+
+    if (loading) return <p>Cargando blogs...</p>;
+    if (error) return <p className="text-red-500">{error}</p>;
+
     return (
-        <div className="mx-auto p-6 rounded">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl text-teal-400 font-semibold">Blogs más recientes</h1>
-                <button className="border border-teal-400 bg-white text-teal-400 px-4 py-2 rounded flex items-center transition duration-200 ease-in-out hover:bg-teal-400 hover:text-white">
-                    <FaPlus className="mr-2" /> Crear nuevo blog
-                </button>
-            </div>
+        <div className="mx-auto p-6 flex flex-col h-screen">
+            <h1 className="text-3xl font-bold text-center mb-6">Gestión de Blogs</h1>
 
-            {/* Search Bar */}
-            <div className="flex justify-end mb-4">
-                <div className="flex items-center">
-                    <span className="mr-2">Search in:</span>
-                    <select className="border border-gray-300 rounded px-2 py-1 mr-2">
-                        <option>Título</option>
-                        <option>Fecha</option>
-                    </select>
-                    <input type="text" className="border border-gray-300 rounded px-2 py-1 mr-2" />
-                    <button className="border border-teal-400 bg-teal-400 text-white px-4 py-1 rounded flex items-center transition duration-200 ease-in-out hover:bg-white hover:text-teal-400 hover:border-teal-400">
-                        <FaSearch className="mr-2" /> Search
-                    </button>
+            {/* Formulario */}
+            <form onSubmit={handleSubmit} className="mb-6 bg-white p-4 shadow-md rounded-lg border">
+                <h2 className="text-xl font-semibold mb-4">{editingBlog ? "Editar Blog" : "Crear Blog"}</h2>
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium">Título:</label>
+                    <input
+                        type="text"
+                        name="titulo"
+                        value={formData.titulo}
+                        onChange={handleInputChange}
+                        className="border border-gray-300 rounded px-3 py-2 w-full"
+                        placeholder="Ingresa el título del blog"
+                        required
+                    />
+                    {formErrors.titulo && <p className="text-red-500 text-sm">{formErrors.titulo}</p>}
                 </div>
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium">Contenido:</label>
+                    <textarea
+                        name="contenido"
+                        value={formData.contenido}
+                        onChange={handleInputChange}
+                        className="border border-gray-300 rounded px-3 py-2 w-full"
+                        placeholder="Escribe el contenido del blog"
+                        required
+                    ></textarea>
+                    {formErrors.contenido && <p className="text-red-500 text-sm">{formErrors.contenido}</p>}
+                </div>
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium">Imagen:</label>
+                    <input
+                        type="file"
+                        name="imagen"
+                        ref={fileInputRef} // Referencia para limpiar el archivo
+                        onChange={handleFileChange}
+                        className="border border-gray-300 rounded px-3 py-2 w-full"
+                    />
+                </div>
+                <button
+                    type="submit"
+                    className={`bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition ${isSubmitting && "opacity-50 cursor-not-allowed"
+                        }`}
+                    disabled={isSubmitting}
+                >
+                    {editingBlog ? "Actualizar Blog" : "Crear Blog"}
+                </button>
+                {editingBlog && (
+                    <button
+                        type="button"
+                        onClick={resetForm}
+                        className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
+                    >
+                        Cancelar
+                    </button>
+                )}
+            </form>
+
+            {/* Tabla */}
+            <div className="flex-grow overflow-y-auto border border-gray-300 rounded-md shadow-md">
+                <table className="w-full border-collapse">
+                    <thead>
+                        <tr className="bg-gray-100">
+                            <th className="border p-2 text-left">ID</th>
+                            <th className="border p-2 text-left">Título</th>
+                            <th className="border p-2 text-left max-w-[400px] truncate">Contenido</th>
+                            <th className="border p-2 text-left">Fecha</th>
+                            <th className="border p-2 text-left">Imagen</th>
+                            <th className="border p-2 text-left">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {blogs.map((blog) => (
+                            <tr key={blog.id_blog} className="hover:bg-gray-50">
+                                <td className="border p-2">{blog.id_blog}</td>
+                                <td className="border p-2">{blog.titulo}</td>
+                                <td
+                                    className="border p-2 max-w-[400px] truncate overflow-hidden"
+                                    title={blog.contenido}
+                                >
+                                    {blog.contenido}
+                                </td>
+                                <td className="border p-2">
+                                    {blog.fecha_blog ? new Date(blog.fecha_blog).toLocaleDateString() : "Sin fecha"}
+                                </td>
+                                <td className="border p-2 text-center">
+                                    {blog.imagePath ? (
+                                        <img
+                                            src={`http://localhost:8080/blog/uploads/${blog.imagePath.split("/").pop()}`}
+                                            alt="Blog"
+                                            className="w-12 h-12 object-cover rounded"
+                                        />
+                                    ) : (
+                                        "Sin imagen"
+                                    )}
+                                </td>
+                                <td className="border p-2 flex space-x-2">
+                                    <button
+                                        onClick={() => handleEdit(blog)}
+                                        className="text-blue-500 hover:text-blue-700"
+                                    >
+                                        <FaEdit />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(blog.id_blog)}
+                                        className="text-red-500 hover:text-red-700"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
-
-            {/* Table */}
-            <table className="w-full border-collapse">
-                <thead>
-                    <tr className="bg-gray-200">
-                        <th className="border p-2 text-left">Editar</th>
-                        <th className="border p-2 text-left">Fotos</th>
-                        <th className="border p-2 text-left">Titulo</th>
-                        <th className="border p-2 text-left">Fecha</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {/* Row 1 */}
-                    <tr className="border-t">
-                        <td className="border p-2 flex items-center">
-                            {showCheckboxes && (
-                                <input type="checkbox" className="mr-2 text-teal-400" />
-                            )}
-                            <div className="flex items-center justify-center border border-teal-400 bg-white rounded-full w-8 h-8 m-2">
-                                <FaPencilAlt className="text-teal-400" />
-                            </div>
-                        </td>
-                        <td className="border p-2">
-                            <div className="flex space-x-2">
-                                <img src="https://placehold.co/100x100" alt="Image of a church in Andorra" className="w-16 h-16 object-cover" />
-                                <img src="https://placehold.co/100x100" alt="Image of a mountain in Andorra" className="w-16 h-16 object-cover" />
-                            </div>
-                            <a href="#" className="text-blue-500">Add New or Edit</a>
-                        </td>
-                        <td className="border p-2">Travel in Andorra</td>
-                        <td className="border p-2">22/08/19 15:30</td>
-                    </tr>
-                    {/* Row 2 */}
-                    <tr className="border-t">
-                        <td className="border p-2 flex items-center">
-                            {showCheckboxes && (
-                                <input type="checkbox" className="mr-2 text-teal-400" />
-                            )}
-                            <div className="flex items-center justify-center border border-teal-400 bg-white rounded-full w-8 h-8 m-2">
-                                <FaPencilAlt className="text-teal-400" />
-                            </div>
-                        </td>
-                        <td className="border p-2">
-                            <div className="flex space-x-2">
-                                <img src="https://placehold.co/100x100" alt="Image of a lighthouse in Azores" className="w-16 h-16 object-cover" />
-                                <img src="https://placehold.co/100x100" alt="Image of a coastline in Azores" className="w-16 h-16 object-cover" />
-                            </div>
-                            <a href="#" className="text-blue-500">Add New or Edit</a>
-                        </td>
-                        <td className="border p-2">Azores Islands - the wildest Portugal</td>
-                        <td className="border p-2">22/08/19 11:39</td>
-                    </tr>
-                    <tr className="border-t">
-                        <td className="border p-2 flex items-center">
-                            {showCheckboxes && (
-                                <input type="checkbox" className="mr-2 text-teal-400" />
-                            )}
-                            <div className="flex items-center justify-center border border-teal-400 bg-white rounded-full w-8 h-8 m-2">
-                                <FaPencilAlt className="text-teal-400" />
-                            </div>
-                        </td>
-                        <td className="border p-2">
-                            <div className="flex space-x-2">
-                                <img src="https://placehold.co/100x100" alt="Image of a lighthouse in Azores" className="w-16 h-16 object-cover" />
-                                <img src="https://placehold.co/100x100" alt="Image of a coastline in Azores" className="w-16 h-16 object-cover" />
-                            </div>
-                            <a href="#" className="text-blue-500">Add New or Edit</a>
-                        </td>
-                        <td className="border p-2">Azores Islands - the wildest Portugal</td>
-                        <td className="border p-2">22/08/19 11:39</td>
-                    </tr>
-                    <tr className="border-t">
-                        <td className="border p-2 flex items-center">
-                            {showCheckboxes && (
-                                <input type="checkbox" className="mr-2 text-teal-400" />
-                            )}
-                            <div className="flex items-center justify-center border border-teal-400 bg-white rounded-full w-8 h-8 m-2">
-                                <FaPencilAlt className="text-teal-400" />
-                            </div>
-                        </td>
-                        <td className="border p-2">
-                            <div className="flex space-x-2">
-                                <img src="https://placehold.co/100x100" alt="Image of a lighthouse in Azores" className="w-16 h-16 object-cover" />
-                                <img src="https://placehold.co/100x100" alt="Image of a coastline in Azores" className="w-16 h-16 object-cover" />
-                            </div>
-                            <a href="#" className="text-blue-500">Add New or Edit</a>
-                        </td>
-                        <td className="border p-2">Azores Islands - the wildest Portugal</td>
-                        <td className="border p-2">22/08/19 11:39</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            {/* Delete Button */}
-            <button className="bg-red-600 text-white px-4 py-2 rounded mt-4" onClick={handleDeleteClick}>
-                Delete
-            </button>
         </div>
     );
-}
-
+};
