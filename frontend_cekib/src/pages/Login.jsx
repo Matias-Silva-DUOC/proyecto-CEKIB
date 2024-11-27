@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Input, Button } from "@material-tailwind/react";
-import Fondo from "../assets/img/fondo.jpg"
-import Logo from "../assets/img/logo.png"
+import Fondo from "../assets/img/fondo.jpg";
+import Logo from "../assets/img/logo.png";
 
 export default function Login() {
     const [username, setUsername] = useState("");
@@ -12,33 +12,36 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("http://localhost:8080/login", {
-                method: "POST",
+            const response = await fetch("http://localhost:8080/users", {
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ username, password }),
             });
 
             if (response.ok) {
-                const data = await response.json();
-                console.log("Login successful:", data);
+                const users = await response.json();
+                const user = users.find(
+                    (u) => u.username === username && u.password === password
+                );
 
-                // Redirigir según el usuario
-                if (username === 'admin') {
-                    navigate("/homeadmin");
+                if (user) {
+                    // Redirigir según el tipo de usuario
+                    if (user.tipoUsuario === "administrador") {
+                        navigate("/homeadmin");
+                    } else if (user.tipoUsuario === "profesional") {
+                        navigate("/homemedico", { state: { idUsuario: user.idUsuario } });
+                    }
                 } else {
-                    navigate("/homemedico");
+                    alert("Usuario o contraseña incorrectos");
                 }
             } else {
-                const errorData = await response.json();
-                console.error("Login failed:", errorData.error);
+                console.error("Error al obtener los usuarios");
             }
         } catch (error) {
             console.error("Error:", error);
         }
     };
-
 
     return (
         <div className="relative flex items-center justify-center min-h-screen">
@@ -60,7 +63,7 @@ export default function Login() {
                     <h1 className="text-teal-400 text-3xl text-center">
                         Acceso
                     </h1>
-                    <form className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96"  onSubmit={handleSubmit}>
+                    <form className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96" onSubmit={handleSubmit}>
                         <div className="mb-1 flex flex-col gap-6">
                             <h6 className="text-teal-400 -mb-3 text-left text-bold">
                                 Usuario:
@@ -97,8 +100,7 @@ export default function Login() {
                         </Button>
                     </form>
                 </Card>
-
             </div>
-        </div >
+        </div>
     );
-};
+}

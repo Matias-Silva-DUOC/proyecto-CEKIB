@@ -4,13 +4,14 @@ import { MdOutlineLogin } from "react-icons/md";
 import { Dialog, Transition } from '@headlessui/react';
 import { useNavigate } from 'react-router-dom';
 import { FaFileMedicalAlt, FaNotesMedical, FaHandHoldingMedical } from "react-icons/fa";
+import { ImBlog } from "react-icons/im";
 import { FaHouseChimneyMedical } from "react-icons/fa6";
 import Logo from "../../assets/img/logo.png";
 import Profesional1 from "../../assets/img/Profesionales/prof1.jpg";
 
 const navigation = [
     { name: 'Home', href: '/homemedico', icon: FaHouseChimneyMedical },
-    { name: 'Ficha Ingreso', href: '/fichaingreso', icon: FaFileMedicalAlt },
+    { name: 'Blog', href: '/blogmedico', icon: ImBlog },
     { name: 'Consultas', href: '/consultas', icon: FaNotesMedical },
     { name: 'Tratamientos', href: '/tratamientos', icon: FaHandHoldingMedical },
 ];

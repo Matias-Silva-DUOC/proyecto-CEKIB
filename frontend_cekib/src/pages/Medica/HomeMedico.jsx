@@ -1,8 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SidebarMed from '../../components/Medica/SidebarMed';
+import { useLocation } from "react-router-dom";
+import axios from 'axios';
 
 export default function HomeMedico() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [profesional, setProfesional] = useState(null); // Estado para guardar los datos del profesional
+    const location = useLocation();
+    const { idUsuario } = location.state || {}; // Accede al idUsuario desde el estado
+
+    // Fetch de datos del profesional
+    useEffect(() => {
+        const fetchProfesional = async () => {
+            try {
+                const response = await axios.get("http://localhost:8080/profesionales");
+                const profesionales = response.data;
+
+                // Filtrar el profesional según el idUsuario
+                const profesionalFiltrado = profesionales.find((pro) => pro.idUsuario === idUsuario);
+                setProfesional(profesionalFiltrado);
+            } catch (error) {
+                console.error("Error al obtener los datos del profesional:", error);
+            }
+        };
+
+        if (idUsuario) {
+            fetchProfesional();
+        }
+    }, [idUsuario]);
 
     return (
         <main>
@@ -14,7 +39,9 @@ export default function HomeMedico() {
                     <div className="bg-white shadow-md rounded p-6 space-y-4">
                         {/* Bienvenida */}
                         <div className="text-center">
-                            <h2 className="text-xl font-bold text-teal-600">¡Bienvenido, Dr. [Nombre del Médico]!</h2>
+                            <h2 className="text-xl font-bold text-teal-600">
+                                ¡Bienvenido al Home Médico, Dr/a. {profesional ? `${profesional.nombrePro} ${profesional.apellidoPro}` : "Cargando..."}!
+                            </h2>
                             <p className="text-gray-600">Aquí está un resumen de tu día y recordatorios importantes.</p>
                         </div>
 
@@ -35,9 +62,11 @@ export default function HomeMedico() {
                         <div className="border-t pt-4">
                             <h3 className="font-semibold text-teal-500">Recordatorios</h3>
                             <ul className="space-y-2">
-                                <li className="text-gray-700">Revisar resultados de laboratorio pendientes</li>
-                                <li className="text-gray-700">Actualizar la ficha del paciente [Nombre]</li>
-                                <li className="text-gray-700">Enviar notas a [Nombre del paciente]</li>
+                                {profesional ? (
+                                    <li className="text-gray-700">{profesional.recordatorio}</li>
+                                ) : (
+                                    <li className="text-gray-700">Cargando recordatorios...</li>
+                                )}
                             </ul>
                         </div>
 
@@ -62,6 +91,6 @@ export default function HomeMedico() {
                     </div>
                 </div>
             </div>
-        </main >
+        </main>
     );
 }

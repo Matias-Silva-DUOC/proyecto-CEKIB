@@ -44,6 +44,9 @@ public class Profesional extends PanacheEntityBase {
     @Column(name = "tipo_usuario", nullable = false, length = 64)
     private String tipoUsuario;
 
+    @Column(name = "id_usuario")
+    private Integer idUsuario;
+
     @OneToMany(mappedBy = "profesional", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Cita> citas = new ArrayList<>();
@@ -54,7 +57,7 @@ public class Profesional extends PanacheEntityBase {
 
     // Constructor completo
     public Profesional(String rutPro, String nombrePro, String apellidoPro, String especialidadPro, String correoPro,
-            String fonoPro, JsonNode horario, String recordatorio, String tipoUsuario) {
+            String fonoPro, JsonNode horario, String recordatorio, String tipoUsuario, Integer idUsuario) {
         this.rutPro = rutPro;
         this.nombrePro = nombrePro;
         this.apellidoPro = apellidoPro;
@@ -64,6 +67,7 @@ public class Profesional extends PanacheEntityBase {
         this.horario = horario;
         this.recordatorio = recordatorio;
         this.tipoUsuario = tipoUsuario;
+        this.idUsuario = idUsuario;
     }
 
     // Getters y setters
@@ -137,6 +141,14 @@ public class Profesional extends PanacheEntityBase {
     
     public void setTipoUsuario(String tipoUsuario) {
         this.tipoUsuario = tipoUsuario;
+    }
+
+    public Integer getIdUsuario() {
+        return idUsuario;
+    }
+    
+    public void setIdUsuario(Integer idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public List<Cita> getCitas() {

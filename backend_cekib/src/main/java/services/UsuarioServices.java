@@ -1,10 +1,14 @@
 package services;
 
 import entities.Usuario;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+
+import java.util.List;
+
 
 // Clase que maneja la lógica de negocio relacionada con los usuarios
 @ApplicationScoped
@@ -28,4 +32,9 @@ public class UsuarioServices {
         // Retorna verdadero si el usuario existe
         return user != null; // Simplifica la autenticación
     }
+
+    public List<Usuario> getAllUsers() {
+        return em.createQuery("SELECT u FROM Usuario u", Usuario.class).getResultList();
+    }    
+    
 }
