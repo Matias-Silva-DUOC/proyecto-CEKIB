@@ -10,7 +10,6 @@ import Logo from "../../assets/img/logo.png";
 import Avatar from "../../assets/img/avatar.png";
 
 const navigation = [
-    { name: 'Home', href: '/homeadmin', icon: FaHome },
     { name: 'Dashboard', href: '/dashboard', icon: MdOutlineDashboard },
     { name: 'Usuarios', href: '/usuarios', icon: FaUsers },
     { name: 'Blog', href: '/blogadmin', icon: ImBlog },

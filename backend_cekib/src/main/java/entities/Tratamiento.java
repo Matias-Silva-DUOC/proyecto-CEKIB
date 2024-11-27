@@ -2,9 +2,13 @@ package entities;
 
 import jakarta.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+
 @Entity
 @Table(name = "tratamiento")
-public class Tratamiento {
+public class Tratamiento extends PanacheEntityBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,18 +26,8 @@ public class Tratamiento {
 
     @ManyToOne
     @JoinColumn(name = "id_cita", referencedColumnName = "id_cita", unique = true)
+    @JsonIgnore
     private Cita cita;
-
-    // Constructor vacío
-    public Tratamiento() {}
-
-    // Constructor completo
-    public Tratamiento(String tipoTratamiento, String descripcionTratamiento, Integer duracionSesiones, Cita cita) {
-        this.tipoTratamiento = tipoTratamiento;
-        this.descripcionTratamiento = descripcionTratamiento;
-        this.duracionSesiones = duracionSesiones;
-        this.cita = cita;
-    }
 
     // Getters y Setters
     public Integer getIdTratamiento() {
@@ -76,3 +70,4 @@ public class Tratamiento {
         this.cita = cita;
     }
 }
+

@@ -1,41 +1,46 @@
 package entities;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 @Entity
 @Table(name = "pago")
-public class Pago {
+public class Pago extends PanacheEntityBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pago")
-    private Integer idPago;
+    private Long idPago;
 
     @Column(name = "fecha_pago", nullable = false)
-    private LocalDateTime fechaPago;
+    private LocalDate fechaPago;
 
     @Column(name = "monto", nullable = false)
-    private Integer monto;
+    private Double monto;
 
-    @Column(name = "metodo_pago", nullable = false, length = 64)
+    @Column(name = "metodo_pago", nullable = false, length = 50)
     private String metodoPago;
 
-    @Column(name = "estado_pago", nullable = false, length = 64)
+    @Column(name = "estado_pago", nullable = false, length = 50)
     private String estadoPago;
 
     @Column(name = "descuento")
-    private Integer descuento;
+    private Double descuento;
 
     @ManyToOne
-    @JoinColumn(name = "id_cita", referencedColumnName = "id_cita", unique = true)
+    @JoinColumn(name = "id_cita", referencedColumnName = "id_cita")
+    @JsonIgnore
     private Cita cita;
 
     // Constructor vacío
     public Pago() {}
 
     // Constructor completo
-    public Pago(LocalDateTime fechaPago, Integer monto, String metodoPago, String estadoPago, Integer descuento, Cita cita) {
+    public Pago(LocalDate fechaPago, Double monto, String metodoPago, String estadoPago, Double descuento, Cita cita) {
         this.fechaPago = fechaPago;
         this.monto = monto;
         this.metodoPago = metodoPago;
@@ -45,27 +50,27 @@ public class Pago {
     }
 
     // Getters y Setters
-    public Integer getIdPago() {
+    public Long getIdPago() {
         return idPago;
     }
 
-    public void setIdPago(Integer idPago) {
+    public void setIdPago(Long idPago) {
         this.idPago = idPago;
     }
 
-    public LocalDateTime getFechaPago() {
+    public LocalDate getFechaPago() {
         return fechaPago;
     }
 
-    public void setFechaPago(LocalDateTime fechaPago) {
+    public void setFechaPago(LocalDate fechaPago) {
         this.fechaPago = fechaPago;
     }
 
-    public Integer getMonto() {
+    public Double getMonto() {
         return monto;
     }
 
-    public void setMonto(Integer monto) {
+    public void setMonto(Double monto) {
         this.monto = monto;
     }
 
@@ -85,11 +90,11 @@ public class Pago {
         this.estadoPago = estadoPago;
     }
 
-    public Integer getDescuento() {
+    public Double getDescuento() {
         return descuento;
     }
 
-    public void setDescuento(Integer descuento) {
+    public void setDescuento(Double descuento) {
         this.descuento = descuento;
     }
 

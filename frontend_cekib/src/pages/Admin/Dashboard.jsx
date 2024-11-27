@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Sidebar from '../../components/Admin/Sidebar';
-import { GraficosDashboard } from '../../components/Admin/Dashboard/GraficosDashboard';
+import GraficosDashboard from '../../components/Admin/Dashboard/GraficosDashboard';
 
 export default function Dashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(false);

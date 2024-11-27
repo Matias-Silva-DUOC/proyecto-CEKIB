@@ -30,7 +30,7 @@ export default function Login() {
                     if (user.tipoUsuario === "administrador") {
                         navigate("/homeadmin");
                     } else if (user.tipoUsuario === "profesional") {
-                        navigate("/homemedico", { state: { idUsuario: user.idUsuario } });
+                        navigate("/dashboard", { state: { idUsuario: user.idUsuario } });
                     }
                 } else {
                     alert("Usuario o contraseña incorrectos");

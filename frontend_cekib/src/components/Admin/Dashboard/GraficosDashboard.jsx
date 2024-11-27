@@ -1,287 +1,266 @@
-import React, { useState, useEffect } from "react";
-import { Doughnut, Bar, Line } from "react-chartjs-2";
-import axios from "axios";
-import { ArcElement } from "chart.js";
-import Chart from "chart.js/auto";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Bar, Pie, Line } from 'react-chartjs-2';
+import 'chart.js/auto';
 
-export function GraficosDashboard() {
-    const [kpiData, setKpiData] = useState({});
-    const [donutData, setDonutData] = useState({});
-    const [barData, setBarData] = useState({});
-    const [lineData, setLineData] = useState({});
-    const [tableData, setTableData] = useState([]);
+const GraficosDashboard = () => {
+    const [usuarios, setUsuarios] = useState([]);
+    const [profesionales, setProfesionales] = useState([]);
+    const [pacientes, setPacientes] = useState([]);
+    const [pagos, setPagos] = useState([]);
+    const [tratamientos, setTratamientos] = useState([]);
+    const [citasPorEspecialidad, setCitasPorEspecialidad] = useState([]);
+    const [citasPorEstado, setCitasPorEstado] = useState([]);
+    const [ingresosPorProfesional, setIngresosPorProfesional] = useState([]);
+    const [ingresosPorEspecialidad, setIngresosPorEspecialidad] = useState([]);
+    const [tendenciaMensual, setTendenciaMensual] = useState([]);
 
     useEffect(() => {
-        async function fetchData() {
+        const fetchData = async () => {
             try {
-                // Obtener datos de las APIs
-                const citasResponse = await axios.get("http://localhost:8080/citas");
-                const pagosResponse = await axios.get("http://localhost:8080/pagos");
+                const citasResponse = await fetch('http://localhost:8080/citas');
+                const pagosResponse = await fetch('http://localhost:8080/pagos');
+                const profesionalesResponse = await fetch('http://localhost:8080/profesionales');
 
-                const citas = citasResponse.data;
-                const pagos = pagosResponse.data;
+                const citasData = await citasResponse.json();
+                const pagosData = await pagosResponse.json();
+                const profesionalesData = await profesionalesResponse.json();
 
-                // Procesar los datos
-                const processedData = processDashboardData(citas, pagos);
+                // Process data here
+                const especialidades = {};
+                const estados = { Confirmada: 0, Pendiente: 0, Anulada: 0 };
+                const ingresosProfesionales = {};
+                const ingresosEspecialidades = {};
+                const ingresosMensuales = Array(12).fill(0);
 
-                // Actualizar los estados
-                setKpiData(processedData.kpiData);
-                setDonutData(processedData.donutData);
-                setBarData(processedData.barData);
-                setLineData(processedData.lineData);
-                setTableData(processedData.tableData);
+                citasData.forEach(cita => {
+                    const especialidad = profesionalesData.find(
+                        prof => prof.rutPro === cita.rutPro
+                    )?.especialidadPro;
+
+                    if (especialidad) {
+                        especialidades[especialidad] = (especialidades[especialidad] || 0) + 1;
+                    }
+
+                    estados[cita.estado_cita]++;
+                });
+
+                pagosData.forEach(pago => {
+                    const profesional = profesionalesData.find(
+                        prof => prof.rutPro === pago.rutPro
+                    );
+
+                    if (profesional) {
+                        ingresosProfesionales[profesional.nombrePro] =
+                            (ingresosProfesionales[profesional.nombrePro] || 0) + pago.monto;
+
+                        ingresosEspecialidades[profesional.especialidadPro] =
+                            (ingresosEspecialidades[profesional.especialidadPro] || 0) + pago.monto;
+                    }
+
+                    const month = new Date(pago.fechaPago).getMonth();
+                    ingresosMensuales[month] += pago.monto;
+                });
+
+                setCitasPorEspecialidad(especialidades);
+                setCitasPorEstado(estados);
+                setIngresosPorProfesional(ingresosProfesionales);
+                setIngresosPorEspecialidad(ingresosEspecialidades);
+                setTendenciaMensual(ingresosMensuales);
             } catch (error) {
-                console.error("Error al obtener los datos:", error);
+                console.error('Error fetching data:', error);
             }
-        }
+        };
 
         fetchData();
     }, []);
 
-    return (
-        <div className="dashboard p-4">
-            {/* KPIs */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
-                <KpiCard title="Ingresos [Año Actual]" value={`$${kpiData.ingresosActual || 0}`} />
-                <KpiCard title="Ingresos [Año Anterior]" value={`$${kpiData.ingresosAnterior || 0}`} />
-                <KpiCard title="Ticket Promedio" value={`$${kpiData.ticketPromedio || 0}`} />
-            </div>
-
-            {/* Gráficos Donut */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-                <DonutChart title="Citas por Especialidad" data={donutData.citasPorEspecialidad} />
-                <DonutChart title="Citas por Estado" data={donutData.citasPorEstado} />
-            </div>
-
-            {/* Gráficos de Barras */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-                <BarChart title="Ingresos por Profesional" data={barData.ingresosPorProfesional} />
-                <BarChart title="Ingresos por Especialidad" data={barData.ingresosPorEspecialidad} />
-            </div>
-            <div className="grid mb-8">
-                <BarChart
-                    title="Sesiones Programadas vs Completadas por Especialidad"
-                    data={barData.sesionesPorEspecialidad}
-                />
-            </div>
-
-            {/* Gráfico de Línea */}
-            <div className="grid mb-8">
-                <LineChart title="Tendencia de Ingresos Mensuales" data={lineData.tendenciaMensual} />
-            </div>
-
-            {/* Tabla Resumen */}
-            <div className="grid mb-8">
-                <SummaryTable data={tableData} />
-            </div>
-        </div>
-    );
-}
-
-function KpiCard({ title, value }) {
-    return (
-        <div className="bg-white shadow-md rounded-lg p-4 text-center border">
-            <h3 className="text-lg font-semibold">{title}</h3>
-            <p className="text-2xl font-bold">{value}</p>
-        </div>
-    );
-}
-
-function DonutChart({ title, data }) {
-    if (!data) return null;
-    return (
-        <div className="bg-white shadow-md rounded-lg p-4 border">
-            <h3 className="text-lg font-semibold mb-4">{title}</h3>
-            <Doughnut data={data} />
-        </div>
-    );
-}
-
-function BarChart({ title, data }) {
-    if (!data) return null;
-    return (
-        <div className="bg-white shadow-md rounded-lg p-4 border">
-            <h3 className="text-lg font-semibold mb-4">{title}</h3>
-            <Bar data={data} />
-        </div>
-    );
-}
-
-function LineChart({ title, data }) {
-    if (!data) return null;
-    return (
-        <div className="bg-white shadow-md rounded-lg p-4 border">
-            <h3 className="text-lg font-semibold mb-4">{title}</h3>
-            <Line data={data} />
-        </div>
-    );
-}
-
-function SummaryTable({ data }) {
-    if (!data || data.length === 0) return null;
-    return (
-        <div className="bg-white shadow-md rounded-lg p-4 border overflow-x-auto">
-            <h3 className="text-lg font-semibold mb-4">Resumen</h3>
-            <table className="min-w-full text-left border-collapse border border-gray-200">
-                <thead>
-                    <tr>
-                        <th className="border border-gray-200 p-2">Especialidad</th>
-                        <th className="border border-gray-200 p-2">Tratamientos</th>
-                        <th className="border border-gray-200 p-2">Sesiones Programadas</th>
-                        <th className="border border-gray-200 p-2">Sesiones Completadas</th>
-                        <th className="border border-gray-200 p-2">% Cumplimiento</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((row, index) => (
-                        <tr key={index}>
-                            <td className="border border-gray-200 p-2">{row.especialidad}</td>
-                            <td className="border border-gray-200 p-2">{row.tratamientos}</td>
-                            <td className="border border-gray-200 p-2">{row.sesionesProgramadas}</td>
-                            <td className="border border-gray-200 p-2">{row.sesionesCompletadas}</td>
-                            <td className="border border-gray-200 p-2">{row.cumplimiento}%</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
-}
-
-function processDashboardData(citas, pagos) {
-    const currentYear = new Date().getFullYear();
-    const lastYear = currentYear - 1;
-
-    const ingresosActual = pagos
-        .filter((p) => new Date(p.fechaPago).getFullYear() === currentYear)
-        .reduce((sum, p) => sum + p.monto, 0);
-
-    const ingresosAnterior = pagos
-        .filter((p) => new Date(p.fechaPago).getFullYear() === lastYear)
-        .reduce((sum, p) => sum + p.monto, 0);
-
-    const ticketPromedio = ingresosActual / citas.length || 0;
-
-    const citasPorEspecialidad = citas.reduce((acc, cita) => {
-        const especialidad = cita.profesional.especialidadPro;
-        acc[especialidad] = (acc[especialidad] || 0) + 1;
-        return acc;
-    }, {});
-
-    const citasPorEstado = citas.reduce((acc, cita) => {
-        acc[cita.estadoCita] = (acc[cita.estadoCita] || 0) + 1;
-        return acc;
-    }, {});
-
-    const ingresosPorProfesional = citas.reduce((acc, cita) => {
-        const profesional = cita.profesional.nombrePro;
-        acc[profesional] = (acc[profesional] || 0) + cita.costo;
-        return acc;
-    }, {});
-
-    const ingresosPorEspecialidad = citas.reduce((acc, cita) => {
-        const especialidad = cita.profesional.especialidadPro;
-        acc[especialidad] = (acc[especialidad] || 0) + cita.costo;
-        return acc;
-    }, {});
-
-    const sesionesPorEspecialidad = citas.reduce((acc, cita) => {
-        const especialidad = cita.profesional.especialidadPro;
-        if (!acc[especialidad]) {
-            acc[especialidad] = { programadas: 0, completadas: 0 };
-        }
-        acc[especialidad].programadas += 1;
-        if (cita.estadoCita === "Completada") {
-            acc[especialidad].completadas += 1;
-        }
-        return acc;
-    }, {});
-
-    const tendenciaMensual = Array(12).fill(0);
-    pagos.forEach((pago) => {
-        const mes = new Date(pago.fechaPago).getMonth();
-        tendenciaMensual[mes] += pago.monto;
+    const generateChartData = (labels, data) => ({
+        labels,
+        datasets: [
+            {
+                label: 'Cantidad',
+                data,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+            },
+        ],
     });
 
-    const tableData = Object.keys(sesionesPorEspecialidad).map((especialidad) => ({
-        especialidad,
-        tratamientos: sesionesPorEspecialidad[especialidad].programadas,
-        sesionesProgramadas: sesionesPorEspecialidad[especialidad].programadas,
-        sesionesCompletadas: sesionesPorEspecialidad[especialidad].completadas,
-        cumplimiento: ((sesionesPorEspecialidad[especialidad].completadas / sesionesPorEspecialidad[especialidad].programadas) * 100).toFixed(2),
-    }));
+    useEffect(() => {
+        axios.get('http://localhost:8080/users').then((res) => setUsuarios(res.data));
+        axios.get('http://localhost:8080/profesionales').then((res) => setProfesionales(res.data));
+        axios.get('http://localhost:8080/pacientes').then((res) => setPacientes(res.data));
+        axios.get('http://localhost:8080/pagos').then((res) => setPagos(res.data));
+        axios.get('http://localhost:8080/tratamientos').then((res) => setTratamientos(res.data));
+    }, []);
 
-    return {
-        kpiData: { ingresosActual, ingresosAnterior, ticketPromedio },
-        donutData: {
-            citasPorEspecialidad: formatDonutData(citasPorEspecialidad),
-            citasPorEstado: formatDonutData(citasPorEstado),
-        },
-        barData: {
-            ingresosPorProfesional: formatBarData(ingresosPorProfesional),
-            ingresosPorEspecialidad: formatBarData(ingresosPorEspecialidad),
-            sesionesPorEspecialidad: formatBarDataSesiones(sesionesPorEspecialidad),
-        },
-        lineData: {
-            tendenciaMensual: formatLineData(tendenciaMensual),
-        },
-        tableData,
-    };
-}
+    const totalPagosCompletados = pagos.filter(p => p.estadoPago === 'Completado').length;
+    const totalPagosPendientes = pagos.filter(p => p.estadoPago === 'Pendiente').length;
 
-function formatBarData(data) {
-    return {
-        labels: Object.keys(data),
-        datasets: [
-            {
-                label: 'Ingresos',
-                data: Object.values(data),
-                backgroundColor: '#36A2EB',
-            },
-        ],
-    };
-}
+    const pagosPorMetodo = pagos.reduce((acc, pago) => {
+        acc[pago.metodoPago] = (acc[pago.metodoPago] || 0) + 1;
+        return acc;
+    }, {});
 
-function formatBarDataSesiones(data) {
-    return {
-        labels: Object.keys(data),
-        datasets: [
-            {
-                label: 'Programadas',
-                data: Object.values(data).map((d) => d.programadas),
-                backgroundColor: '#FF6384',
-            },
-            {
-                label: 'Completadas',
-                data: Object.values(data).map((d) => d.completadas),
-                backgroundColor: '#4BC0C0',
-            },
-        ],
-    };
-}
+    const tratamientosPorTipo = tratamientos.reduce((acc, tratamiento) => {
+        acc[tratamiento.tipoTratamiento] = (acc[tratamiento.tipoTratamiento] || 0) + 1;
+        return acc;
+    }, {});
 
-function formatLineData(data) {
-    return {
-        labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-        datasets: [
-            {
-                label: 'Ingresos Mensuales',
-                data,
-                fill: false,
-                borderColor: '#FFCE56',
-            },
-        ],
-    };
-}
+    // Agrupación por rangos de edad
+    const pacientesPorRangoEdad = pacientes.reduce((acc, paciente) => {
+        const edad = paciente.edadPac;
+        if (edad < 18) acc['Menores de 18']++;
+        else if (edad >= 18 && edad <= 30) acc['18-30']++;
+        else if (edad >= 31 && edad <= 45) acc['31-45']++;
+        else if (edad >= 46 && edad <= 60) acc['46-60']++;
+        else acc['Mayores de 60']++;
+        return acc;
+    }, { 'Menores de 18': 0, '18-30': 0, '31-45': 0, '46-60': 0, 'Mayores de 60': 0 })
 
-function formatDonutData(data) {
-    return {
-        labels: Object.keys(data),
-        datasets: [
-            {
-                data: Object.values(data),
-                backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
-            },
-        ],
-    };
-}
+    return (
+        <div className="min-h-screen bg-gray-50 p-4">
+            <header className="bg-teal-400 text-white p-4 rounded shadow">
+                <h1 className="text-2xl font-bold">Dashboard - Estadísticas</h1>
+            </header>
+
+            <section className="flex justify-between items-stretch gap-4 mt-6">
+                <div className="bg-white p-4 rounded shadow border border-teal-400 text-center flex-1">
+                    <h2 className="text-lg font-semibold">Total de Usuarios</h2>
+                    <p className="text-2xl mt-2 font-bold">{usuarios.length}</p>
+                </div>
+
+                <div className="bg-white p-4 rounded shadow border border-teal-400 text-center flex-1">
+                    <h2 className="text-lg font-semibold">Profesionales</h2>
+                    <p className="text-2xl mt-2 font-bold">{profesionales.length}</p>
+                </div>
+
+                <div className="bg-white p-4 rounded shadow border border-teal-400 text-center flex-1">
+                    <h2 className="text-lg font-semibold">Pacientes</h2>
+                    <p className="text-2xl mt-2 font-bold">{pacientes.length}</p>
+                </div>
+
+                <div className="bg-white p-4 rounded shadow border border-teal-400 text-center flex-1">
+                    <h2 className="text-lg font-semibold">Pagos Completados</h2>
+                    <p className="text-2xl mt-2 font-bold">{totalPagosCompletados}</p>
+                </div>
+
+                <div className="bg-white p-4 rounded shadow border border-teal-400 text-center flex-1">
+                    <h2 className="text-lg font-semibold">Pagos Pendientes</h2>
+                    <p className="text-2xl mt-2 font-bold">{totalPagosPendientes}</p>
+                </div>
+            </section>
+
+            <section className="flex justify-between items-stretch mt-8 space-x-4">
+                <div className="bg-white p-6 rounded shadow flex-1">
+                    <h2 className="text-xl font-bold text-teal-400 mb-4">Pagos por Método</h2>
+                    <Pie
+                        data={{
+                            labels: Object.keys(pagosPorMetodo),
+                            datasets: [
+                                {
+                                    data: Object.values(pagosPorMetodo),
+                                    backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe'],
+                                },
+                            ],
+                        }}
+                    />
+                </div>
+
+                <div className="bg-white p-6 rounded shadow flex-1">
+                    <h2 className="text-xl font-bold text-teal-400 mb-4">Tratamientos por Tipo</h2>
+                    <Bar
+                        data={{
+                            labels: Object.keys(tratamientosPorTipo),
+                            datasets: [
+                                {
+                                    label: 'Cantidad',
+                                    data: Object.values(tratamientosPorTipo),
+                                    backgroundColor: '#36a2eb',
+                                },
+                            ],
+                        }}
+                    />
+                </div>
+
+                <div className="bg-white p-6 rounded shadow flex-1">
+                    <h2 className="text-xl font-bold text-teal-400 mb-4">Pacientes por Rango de Edad</h2>
+                    <Bar
+                        data={{
+                            labels: Object.keys(pacientesPorRangoEdad),
+                            datasets: [
+                                {
+                                    label: 'Cantidad de Pacientes',
+                                    data: Object.values(pacientesPorRangoEdad),
+                                    backgroundColor: '#4caf50',
+                                },
+                            ],
+                        }}
+                        options={{
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                },
+                            },
+                        }}
+                    />
+                </div>
+            </section>
+
+            <div className="bg-white p-6 rounded shadow w-full">
+                <h2 className="text-xl font-bold text-teal-400 mb-4 text-center">Estadísticas Generales</h2>
+                <ul className="flex justify-between items-center border rounded-xl border-teal-300">
+                    <li className="flex-1 text-center">
+                        <p className="text-lg font-semibold">Total de Tratamientos</p>
+                        <p className="text-2xl font-bold mt-2">{tratamientos.length}</p>
+                    </li>
+                    <li className="flex-1 text-center">
+                        <p className="text-lg font-semibold">Total de Pagos</p>
+                        <p className="text-2xl font-bold mt-2">{pagos.length}</p>
+                    </li>
+                    <li className="flex-1 text-center">
+                        <p className="text-lg font-semibold">Total de Sesiones</p>
+                        <p className="text-2xl font-bold mt-2">
+                            {tratamientos.reduce((sum, t) => sum + t.duracionSesiones, 0)}
+                        </p>
+                    </li>
+                </ul>
+            </div>
+
+            <div className="bg-white p-4 shadow-md rounded-md text-center flex items-center justify-center">
+                <div className="w-full max-w-4xl">
+                    <h2 className="text-xl font-bold text-teal-400 mb-4 text-center">Tendencia de Ingresos Mensuales</h2>
+                    <div className="h-96">
+                        <Line
+                            data={generateChartData(
+                                [
+                                    'Enero',
+                                    'Febrero',
+                                    'Marzo',
+                                    'Abril',
+                                    'Mayo',
+                                    'Junio',
+                                    'Julio',
+                                    'Agosto',
+                                    'Septiembre',
+                                    'Octubre',
+                                    'Noviembre',
+                                    'Diciembre',
+                                ],
+                                tendenciaMensual
+                            )}
+                            options={{
+                                maintainAspectRatio: false,
+                            }}
+                        />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    );
+};
+
+export default GraficosDashboard;
