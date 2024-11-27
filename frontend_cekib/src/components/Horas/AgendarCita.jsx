@@ -66,19 +66,27 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
 
   const confirmarCita = () => {
     if (fechaSeleccionada && horaSeleccionada) {
-      const nuevaCita = {
-        fecha: fechaSeleccionada.toLocaleDateString("es-ES"),
-        hora: horaSeleccionada,
-      };
+        const citaAgendadaISO = new Date(
+            `${fechaSeleccionada.toISOString().split("T")[0]}T${horaSeleccionada}:00`
+        ).toISOString();
 
-      setCitaAgendada(nuevaCita);
+        const nuevaCita = {
+            fecha: fechaSeleccionada.toLocaleDateString("es-ES"),
+            hora: horaSeleccionada,
+        };
 
-      // Avanza al siguiente paso
-      setActiveStep((prevStep) => prevStep + 1);
+        setCitaAgendada({
+            citaAgendadaISO, // Agregar este valor formateado
+            ...nuevaCita,
+        });
+
+        // Avanza al siguiente paso
+        setActiveStep((prevStep) => prevStep + 1);
     } else {
-      alert("Por favor selecciona una fecha y un horario.");
+        alert("Por favor selecciona una fecha y un horario.");
     }
-  };
+};
+
 
   const generarHorarios = (inicio, fin) => {
     const horarios = [];

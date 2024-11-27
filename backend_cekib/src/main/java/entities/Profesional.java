@@ -1,12 +1,19 @@
 package entities;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import utils.JsonbType;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.ArrayList;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+
 @Entity
 @Table(name = "profesional")
-public class Profesional {
+public class Profesional extends PanacheEntityBase {
 
     @Id
     @Column(name = "rut_pro", nullable = false)
@@ -37,11 +44,29 @@ public class Profesional {
     @Column(name = "tipo_usuario", nullable = false, length = 64)
     private String tipoUsuario;
 
-    @OneToOne
-    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", unique = true)
-    private Usuario usuario;
+    @OneToMany(mappedBy = "profesional", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Cita> citas = new ArrayList<>();
 
-    // Getters y Setters
+    // Constructor vacío
+    public Profesional() {
+    }
+
+    // Constructor completo
+    public Profesional(String rutPro, String nombrePro, String apellidoPro, String especialidadPro, String correoPro,
+            String fonoPro, JsonNode horario, String recordatorio, String tipoUsuario) {
+        this.rutPro = rutPro;
+        this.nombrePro = nombrePro;
+        this.apellidoPro = apellidoPro;
+        this.especialidadPro = especialidadPro;
+        this.correoPro = correoPro;
+        this.fonoPro = fonoPro;
+        this.horario = horario;
+        this.recordatorio = recordatorio;
+        this.tipoUsuario = tipoUsuario;
+    }
+
+    // Getters y setters
     public String getRutPro() {
         return rutPro;
     }
@@ -93,7 +118,7 @@ public class Profesional {
     public JsonNode getHorario() {
         return horario;
     }
-
+    
     public void setHorario(JsonNode horario) {
         this.horario = horario;
     }
@@ -101,7 +126,7 @@ public class Profesional {
     public String getRecordatorio() {
         return recordatorio;
     }
-
+    
     public void setRecordatorio(String recordatorio) {
         this.recordatorio = recordatorio;
     }
@@ -109,17 +134,16 @@ public class Profesional {
     public String getTipoUsuario() {
         return tipoUsuario;
     }
-
+    
     public void setTipoUsuario(String tipoUsuario) {
         this.tipoUsuario = tipoUsuario;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public List<Cita> getCitas() {
+        return citas;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setCitas(List<Cita> citas) {
+        this.citas = citas;
     }
 }
-

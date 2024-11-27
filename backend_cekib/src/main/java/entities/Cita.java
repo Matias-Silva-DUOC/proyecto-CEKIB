@@ -3,14 +3,11 @@ package entities;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
 @Entity
 @Table(name = "cita")
-public class Cita {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cita")
-    private Integer idCita;
+public class Cita extends PanacheEntity {
 
     @Column(name = "fecha_cita", nullable = false)
     private LocalDateTime fechaCita;
@@ -18,34 +15,15 @@ public class Cita {
     @Column(name = "estado_cita", nullable = false, length = 64)
     private String estadoCita;
 
-    @OneToOne
-    @JoinColumn(name = "rut_pac", referencedColumnName = "rut_pac", unique = true)
+    @ManyToOne
+    @JoinColumn(name = "rut_pac", referencedColumnName = "rut_pac", nullable = false)
     private Paciente paciente;
 
-    @OneToOne
-    @JoinColumn(name = "rut_pro", referencedColumnName = "rut_pro", unique = true)
+    @ManyToOne
+    @JoinColumn(name = "rut_pro", referencedColumnName = "rut_pro", nullable = false)
     private Profesional profesional;
 
-    // Constructor vacío
-    public Cita() {}
-
-    // Constructor completo
-    public Cita(LocalDateTime fechaCita, String estadoCita, Paciente paciente, Profesional profesional) {
-        this.fechaCita = fechaCita;
-        this.estadoCita = estadoCita;
-        this.paciente = paciente;
-        this.profesional = profesional;
-    }
-
-    // Getters y Setters
-    public Integer getIdCita() {
-        return idCita;
-    }
-
-    public void setIdCita(Integer idCita) {
-        this.idCita = idCita;
-    }
-
+    // Getters y setters
     public LocalDateTime getFechaCita() {
         return fechaCita;
     }

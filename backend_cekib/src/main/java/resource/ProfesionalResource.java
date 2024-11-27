@@ -3,13 +3,9 @@ package resource;
 import entities.Profesional;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 
 import java.util.List;
 
@@ -61,40 +57,38 @@ public class ProfesionalResource {
                     .build();
         }
     }
-
-
-
-/**
-     * Actualizar profesional
-     * 
-     * @param rutPro
-     * @param profesional
-     * @return
-     */
-    @PUT
-    @Path("/{rutPro}")
-    public Response updateProfesioanl(@PathParam("rutPro") String rutPro, Profesional profesional) {
-        try {
-            Profesional existingProfesional = em.find(Profesional.class, rutPro);
-            if (existingProfesional == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Profesional con rut " + rutPro + " no encontrado.")
-                        .build();
-            }
-            em.getTransaction().begin();
-            existingProfesional.setRutPro(profesional.getRutPro());
-            existingProfesional.setNombrePro(profesional.getNombrePro());
-            existingProfesional.setEspecialidadPro(profesional.getEspecialidadPro());
-            existingProfesional.setCorreoPro(profesional.getCorreoPro());
-            existingProfesional.setFonoPro(profesional.getFonoPro());
-            existingProfesional.setHorario(profesional.getHorario()); 
-            em.merge(existingProfesional);
-            em.getTransaction().commit();
-            return Response.ok("Profesional actualizado exitosamente").build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.serverError().entity("Error al actualizar profesional").build();
-        }
-    }
-
 }
+/**
+//     * Actualizar profesional
+//     * 
+//     * @param rutPro
+//     * @param profesional
+//     * @return
+//     */
+//    @PUT
+//    @Path("/{rutPro}")
+//    public Response updateProfesioanl(@PathParam("rutPro") String rutPro, Profesional profesional) {
+//        try {
+//            Profesional existingProfesional = em.find(Profesional.class, rutPro);
+//            if (existingProfesional == null) {
+//                return Response.status(Response.Status.NOT_FOUND)
+//                        .entity("Profesional con rut " + rutPro + " no encontrado.")
+//                        .build();
+//            }
+//            em.getTransaction().begin();
+//            existingProfesional.setRutPro(profesional.getRutPro());
+//            existingProfesional.setNombrePro(profesional.getNombrePro());
+//            existingProfesional.setEspecialidadPro(profesional.getEspecialidadPro());
+//            existingProfesional.setCorreoPro(profesional.getCorreoPro());
+//            existingProfesional.setFonoPro(profesional.getFonoPro());
+//            existingProfesional.setHorario(profesional.getHorario()); 
+//            em.merge(existingProfesional);
+//            em.getTransaction().commit();
+//            return Response.ok("Profesional actualizado exitosamente").build();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return Response.serverError().entity("Error al actualizar profesional").build();
+//        }
+//    }
+//
+//}

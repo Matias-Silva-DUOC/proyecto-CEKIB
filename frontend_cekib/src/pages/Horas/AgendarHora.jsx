@@ -50,11 +50,48 @@ export default function AgendarHora() {
         }));
     };
 
-    const handleSubmit = () => {
-        console.log("Datos del paciente:", formData);
-        // Aquí podrías enviar los datos al backend o realizar cualquier acción adicional
+    const handleSubmit = async () => {
+        if (!formData.nombre || !formData.apellido || !formData.telefono || !formData.correo) {
+            alert("Por favor completa todos los campos.");
+            return;
+        }
+    
+        // Validar que citaAgendada tenga el formato correcto
+        if (!citaAgendada?.citaAgendadaISO) {
+            alert("Por favor selecciona una fecha y hora válidas.");
+            return;
+        }
+    
+        const payload = {
+            rutPaciente: rutPac,
+            tipoTratamiento,
+            rutProfesional: rutProSeleccionado,
+            citaAgendada: citaAgendada.citaAgendadaISO, // Enviar el formato correcto
+            nombrePaciente: formData.nombre,
+            apellidoPaciente: formData.apellido,
+            telefonoPaciente: formData.telefono,
+            correoPaciente: formData.correo,
+        };
+    
+        try {
+            const response = await axios.post('http://localhost:8080/citas', payload, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (response.status === 201) {
+                alert("¡Reserva confirmada con éxito!");
+                setActiveStep(1); // Reiniciar el flujo de pasos si es necesario
+            } else {
+                alert("Hubo un problema al confirmar la reserva. Por favor, inténtalo de nuevo.");
+            }
+        } catch (error) {
+            console.error("Error al guardar la reserva:", error);
+            alert("Ocurrió un error al intentar guardar la reserva. Revisa la consola para más detalles.");
+        }
     };
-
+    
 
     useEffect(() => {
         const fetchProfesionales = async () => {
@@ -450,8 +487,8 @@ export default function AgendarHora() {
                         </div>
                     </div>
                 )
-            }
-        };
+        }
+    };
 
     return (
         <div className="flex flex-col min-h-screen">

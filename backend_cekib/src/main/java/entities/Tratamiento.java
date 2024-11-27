@@ -20,8 +20,8 @@ public class Tratamiento {
     @Column(name = "duracion_sesiones", nullable = false)
     private Integer duracionSesiones;
 
-    @OneToOne
-    @JoinColumn(name = "id_cita", referencedColumnName = "id_cita", unique = true)
+    @ManyToOne
+    @JoinColumn(name = "id_cita", referencedColumnName = "id", unique = true)
     private Cita cita;
 
     // Constructor vacío

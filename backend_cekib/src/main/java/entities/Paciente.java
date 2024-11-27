@@ -1,10 +1,14 @@
 package entities;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import jakarta.persistence.*;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 @Entity
 @Table(name = "paciente")
-public class Paciente {
+public class Paciente extends PanacheEntityBase {
 
     @Id
     @Column(name = "rut_pac", nullable = false)
@@ -32,12 +36,16 @@ public class Paciente {
     @JoinColumn(name = "id_ficha", referencedColumnName = "id_ficha", unique = true)
     private Ficha ficha;
 
+    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cita> citas = new ArrayList<>();
+
     // Constructor vacío
-    public Paciente() {}
+    public Paciente() {
+    }
 
     // Constructor completo
     public Paciente(String rutPac, String nombrePac, String apellidoPac, String correoPac, String fonoPac,
-                    String ocupacion, String prevision, Ficha ficha) {
+            String ocupacion, String prevision, Ficha ficha) {
         this.rutPac = rutPac;
         this.nombrePac = nombrePac;
         this.apellidoPac = apellidoPac;
