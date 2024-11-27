@@ -125,6 +125,7 @@ export default function ConsultarHora() {
                                             <th className="px-4 py-2 align-middle border-b border-deep-purple-500">Hora Cita</th>
                                             <th className="px-4 py-2 align-middle border-b border-deep-purple-500">Fecha Cita</th>
                                             <th className="px-4 py-2 align-middle border-b border-deep-purple-500">Nombre Profesional</th>
+                                            <th className="px-4 py-2 align-middle border-b border-deep-purple-500">Estado Cita</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -141,6 +142,9 @@ export default function ConsultarHora() {
                                                 </td>
                                                 <td className="border border-gray-300 px-4 py-2 align-middle">
                                                     {cita.nombreProfesional}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-2 align-middle">
+                                                    {cita.estadoCita}
                                                 </td>
                                             </tr>
                                         ))}

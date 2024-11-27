@@ -20,6 +20,9 @@ public class Paciente extends PanacheEntityBase {
     @Column(name = "apellido_pac", nullable = false, length = 64)
     private String apellidoPac;
 
+    @Column(name = "edad", nullable = false, length = 64)
+    private String edadPac;
+
     @Column(name = "correo_pac", length = 64)
     private String correoPac;
 
@@ -32,10 +35,6 @@ public class Paciente extends PanacheEntityBase {
     @Column(name = "prevision", nullable = false, length = 64)
     private String prevision;
 
-    @OneToOne
-    @JoinColumn(name = "id_ficha", referencedColumnName = "id_ficha", unique = true)
-    private Ficha ficha;
-
     @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Cita> citas = new ArrayList<>();
 
@@ -44,19 +43,20 @@ public class Paciente extends PanacheEntityBase {
     }
 
     // Constructor completo
-    public Paciente(String rutPac, String nombrePac, String apellidoPac, String correoPac, String fonoPac,
-            String ocupacion, String prevision, Ficha ficha) {
+    public Paciente(String rutPac, String nombrePac, String apellidoPac, String edadPac, String correoPac,
+            String fonoPac, String ocupacion, String prevision) {
         this.rutPac = rutPac;
         this.nombrePac = nombrePac;
         this.apellidoPac = apellidoPac;
+        this.edadPac = edadPac;
         this.correoPac = correoPac;
         this.fonoPac = fonoPac;
         this.ocupacion = ocupacion;
         this.prevision = prevision;
-        this.ficha = ficha;
+        this.citas = new ArrayList<>();
     }
 
-    // Getters y Setters
+    // Getters y setters
     public String getRutPac() {
         return rutPac;
     }
@@ -79,6 +79,14 @@ public class Paciente extends PanacheEntityBase {
 
     public void setApellidoPac(String apellidoPac) {
         this.apellidoPac = apellidoPac;
+    }
+
+    public String getEdadPac() {
+        return edadPac;
+    }
+
+    public void setEdadPac(String edadPac) {
+        this.edadPac = edadPac;
     }
 
     public String getCorreoPac() {
@@ -113,11 +121,17 @@ public class Paciente extends PanacheEntityBase {
         this.prevision = prevision;
     }
 
-    public Ficha getFicha() {
-        return ficha;
+    public List<Cita> getCitas() {
+        return citas;
     }
 
-    public void setFicha(Ficha ficha) {
-        this.ficha = ficha;
+    public void addCita(Cita cita) {
+        citas.add(cita);
+        cita.setPaciente(this);
+    }
+
+    public void removeCita(Cita cita) {
+        citas.remove(cita);
+        cita.setPaciente(null);
     }
 }

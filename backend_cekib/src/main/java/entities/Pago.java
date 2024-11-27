@@ -28,7 +28,7 @@ public class Pago {
     private Integer descuento;
 
     @ManyToOne
-    @JoinColumn(name = "id_cita", referencedColumnName = "id", unique = true)
+    @JoinColumn(name = "id_cita", referencedColumnName = "id_cita", unique = true)
     private Cita cita;
 
     // Constructor vacío

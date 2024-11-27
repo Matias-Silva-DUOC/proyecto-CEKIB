@@ -6,8 +6,16 @@ import axios from 'axios';
 export default function HomeMedico() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profesional, setProfesional] = useState(null); // Estado para guardar los datos del profesional
+    const [currentIdUsuario, setCurrentIdUsuario] = useState(null); // Estado para guardar el idUsuario actual
     const location = useLocation();
     const { idUsuario } = location.state || {}; // Accede al idUsuario desde el estado
+
+    // Actualizar el idUsuario si cambia
+    useEffect(() => {
+        if (idUsuario && idUsuario !== currentIdUsuario) {
+            setCurrentIdUsuario(idUsuario);
+        }
+    }, [idUsuario, currentIdUsuario]);
 
     // Fetch de datos del profesional
     useEffect(() => {
@@ -16,18 +24,18 @@ export default function HomeMedico() {
                 const response = await axios.get("http://localhost:8080/profesionales");
                 const profesionales = response.data;
 
-                // Filtrar el profesional según el idUsuario
-                const profesionalFiltrado = profesionales.find((pro) => pro.idUsuario === idUsuario);
+                // Filtrar el profesional según el currentIdUsuario
+                const profesionalFiltrado = profesionales.find((pro) => pro.idUsuario === currentIdUsuario);
                 setProfesional(profesionalFiltrado);
             } catch (error) {
                 console.error("Error al obtener los datos del profesional:", error);
             }
         };
 
-        if (idUsuario) {
+        if (currentIdUsuario) {
             fetchProfesional();
         }
-    }, [idUsuario]);
+    }, [currentIdUsuario]);
 
     return (
         <main>
@@ -47,7 +55,7 @@ export default function HomeMedico() {
 
                         {/* Pacientes del Día */}
                         <div className="border-t pt-4 space-y-3">
-                            <h3 className="font-semibold text-teal-500">Pacientes del Día</h3>
+                            <h3 className="font-semibold text-teal-500">Pacientes de la semana</h3>
                             <ul className="space-y-2">
                                 {[...Array(3)].map((_, idx) => (
                                     <li key={idx} className="flex justify-between items-center">

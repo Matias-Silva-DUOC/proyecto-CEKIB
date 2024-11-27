@@ -75,17 +75,18 @@ export default function ConfirmarHora() {
         }
     };
 
-    const cambiarEstadoCita = async (citaId) => {
+    const cambiarEstadoCita = async (idCita) => {
         try {
-            await axios.put(`http://localhost:8080/citas/${citaId}/confirmar`); // Suponiendo que tienes esta ruta para confirmar citas
-            const citasActualizadas = citas.map((cita) => 
-                cita.id === citaId ? { ...cita, estadoCita: "Confirmada" } : cita
+            await axios.put(`http://localhost:8080/citas/${idCita}/confirmar`); // Suponiendo que tienes esta ruta para confirmar citas
+            const citasActualizadas = citas.map((cita) =>
+                cita.idCita === idCita ? { ...cita, estadoCita: "Confirmada" } : cita
             );
             setCitas(citasActualizadas);
         } catch (err) {
             console.error("Error al cambiar el estado de la cita:", err);
         }
     };
+    
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -163,7 +164,7 @@ export default function ConfirmarHora() {
                                                         <Button
                                                             color="teal"
                                                             className="bg-teal-400 text-white rounded"
-                                                            onClick={() => cambiarEstadoCita(cita.id)}
+                                                            onClick={() => cambiarEstadoCita(cita.idCita)}
                                                         >
                                                             Confirmar
                                                         </Button>

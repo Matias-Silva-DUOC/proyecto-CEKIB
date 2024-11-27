@@ -3,11 +3,16 @@ package entities;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 @Entity
 @Table(name = "cita")
-public class Cita extends PanacheEntity {
+public class Cita extends PanacheEntityBase {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_cita", nullable = false)
+    private Long idCita;
 
     @Column(name = "fecha_cita", nullable = false)
     private LocalDateTime fechaCita;
@@ -24,6 +29,14 @@ public class Cita extends PanacheEntity {
     private Profesional profesional;
 
     // Getters y setters
+    public Long getIdCita() {
+        return idCita;
+    }
+
+    public void setIdCita(Long idCita) {
+        this.idCita = idCita;
+    }
+
     public LocalDateTime getFechaCita() {
         return fechaCita;
     }

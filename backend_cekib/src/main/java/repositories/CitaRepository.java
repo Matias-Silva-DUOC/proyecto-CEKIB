@@ -23,12 +23,11 @@ public class CitaRepository {
 
     // Método para encontrar citas por RUT del paciente
     public List<Cita> findByRutPaciente(String rutPaciente) {
-      String jpql = "SELECT c FROM Cita c WHERE c.paciente.rutPac = :rutPaciente";
-      TypedQuery<Cita> query = entityManager.createQuery(jpql, Cita.class);
-      query.setParameter("rutPaciente", rutPaciente);
-      return query.getResultList();
-  }
-  
+        String jpql = "SELECT c FROM Cita c WHERE c.paciente.rutPac = :rutPaciente";
+        TypedQuery<Cita> query = entityManager.createQuery(jpql, Cita.class);
+        query.setParameter("rutPaciente", rutPaciente);
+        return query.getResultList();
+    }
 
     // Método para guardar una cita
     public void save(Cita cita) {
@@ -48,4 +47,3 @@ public class CitaRepository {
         }
     }
 }
-

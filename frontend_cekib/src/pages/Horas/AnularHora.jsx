@@ -75,11 +75,11 @@ export default function AnularHora() {
         }
     };
 
-    const cambiarEstadoCita = async (citaId) => {
+    const cambiarEstadoCita = async (idCita) => {
         try {
-            await axios.put(`http://localhost:8080/citas/${citaId}/anular`); // Suponiendo que tienes esta ruta para anular citas
+            await axios.put(`http://localhost:8080/citas/${idCita}/anular`); // Suponiendo que tienes esta ruta para anular citas
             const citasActualizadas = citas.map((cita) =>
-                cita.id === citaId ? { ...cita, estadoCita: "Anulada" } : cita
+                cita.idCita === idCita ? { ...cita, estadoCita: "Anulada" } : cita
             );
             setCitas(citasActualizadas);
         } catch (err) {
@@ -163,7 +163,7 @@ export default function AnularHora() {
                                                         <Button
                                                             color="teal"
                                                             className="bg-teal-400 text-white rounded"
-                                                            onClick={() => cambiarEstadoCita(cita.id)}
+                                                            onClick={() => cambiarEstadoCita(cita.idCita)}
                                                         >
                                                             Anular
                                                         </Button>

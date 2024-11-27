@@ -11,9 +11,9 @@ import Profesional1 from "../../assets/img/Profesionales/prof1.jpg";
 
 const navigation = [
     { name: 'Home', href: '/homemedico', icon: FaHouseChimneyMedical },
-    { name: 'Blog', href: '/blogmedico', icon: ImBlog },
     { name: 'Consultas', href: '/consultas', icon: FaNotesMedical },
     { name: 'Tratamientos', href: '/tratamientos', icon: FaHandHoldingMedical },
+    { name: 'Blog', href: '/blogmedico', icon: ImBlog },
 ];
 
 const SidebarMed = ({ sidebarOpen, setSidebarOpen }) => {

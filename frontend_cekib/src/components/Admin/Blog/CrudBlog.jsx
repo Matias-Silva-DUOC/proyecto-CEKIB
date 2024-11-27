@@ -114,76 +114,78 @@ export function CrudBlog() {
 
     return (
         <div className="mx-auto p-6 flex flex-col h-screen">
-            <h1 className="text-3xl font-bold text-center mb-6">Gestión de Blogs</h1>
+            <h1 className="text-xl font-bold text-teal-400 text-center mb-2">Gestión de Blogs</h1>
 
             {/* Formulario */}
-            <form onSubmit={handleSubmit} className="mb-6 bg-white p-4 shadow-md rounded-lg border">
-                <h2 className="text-xl font-semibold mb-4">{editingBlog ? "Editar Blog" : "Crear Blog"}</h2>
+            <form onSubmit={handleSubmit} className="mb-6 bg-white p-4 border-teal-400 rounded-lg border">
+                <h2 className="text-lg text-teal-400 font-semibold mb-2">{editingBlog ? "Editar Blog" : "Crear Blog"}</h2>
                 <div className="mb-4">
-                    <label className="block text-gray-700 font-medium">Título:</label>
+                    <label className="block text-base">Título:</label>
                     <input
                         type="text"
                         name="titulo"
                         value={formData.titulo}
                         onChange={handleInputChange}
-                        className="border border-gray-300 rounded px-3 py-2 w-full"
+                        className="border-2 border-gray-500 rounded px-3 py-2 w-full"
                         placeholder="Ingresa el título del blog"
                         required
                     />
                     {formErrors.titulo && <p className="text-red-500 text-sm">{formErrors.titulo}</p>}
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700 font-medium">Contenido:</label>
+                    <label className="block text-base font-medium">Contenido:</label>
                     <textarea
                         name="contenido"
                         value={formData.contenido}
                         onChange={handleInputChange}
-                        className="border border-gray-300 rounded px-3 py-2 w-full"
+                        className="border-2 border-gray-500 rounded px-3 py-2 w-full"
                         placeholder="Escribe el contenido del blog"
                         required
                     ></textarea>
                     {formErrors.contenido && <p className="text-red-500 text-sm">{formErrors.contenido}</p>}
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700 font-medium">Imagen:</label>
+                    <label className="block text-base font-medium">Imagen:</label>
                     <input
                         type="file"
                         name="imagen"
                         ref={fileInputRef} // Referencia para limpiar el archivo
                         onChange={handleFileChange}
-                        className="border border-gray-300 rounded px-3 py-2 w-full"
+                        className="border rounded px-3 py-2 w-full"
                     />
                 </div>
-                <button
-                    type="submit"
-                    className={`bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition ${isSubmitting && "opacity-50 cursor-not-allowed"
-                        }`}
-                    disabled={isSubmitting}
-                >
-                    {editingBlog ? "Actualizar Blog" : "Crear Blog"}
-                </button>
-                {editingBlog && (
+                <div className="flex justify-end">
                     <button
-                        type="button"
-                        onClick={resetForm}
-                        className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
+                        type="submit"
+                        className={`bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition ${isSubmitting && "opacity-50 cursor-not-allowed"
+                            }`}
+                        disabled={isSubmitting}
                     >
-                        Cancelar
+                        {editingBlog ? "Actualizar Blog" : "Crear Blog"}
                     </button>
-                )}
+                    {editingBlog && (
+                        <button
+                            type="button"
+                            onClick={resetForm}
+                            className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
+                        >
+                            Cancelar
+                        </button>
+                    )}
+                </div>
             </form>
 
             {/* Tabla */}
-            <div className="flex-grow overflow-y-auto border border-gray-300 rounded-md shadow-md">
+            <div className="flex-grow overflow-y-auto border border-gray-500 rounded-md shadow-md">
                 <table className="w-full border-collapse">
                     <thead>
                         <tr className="bg-gray-100">
-                            <th className="border p-2 text-left">ID</th>
-                            <th className="border p-2 text-left">Título</th>
-                            <th className="border p-2 text-left max-w-[400px] truncate">Contenido</th>
-                            <th className="border p-2 text-left">Fecha</th>
-                            <th className="border p-2 text-left">Imagen</th>
-                            <th className="border p-2 text-left">Acciones</th>
+                            <th className="border text-teal-400 p-2 text-left">ID</th>
+                            <th className="border text-teal-400 p-2 text-left">Título</th>
+                            <th className="border text-teal-400 p-2 text-left max-w-[400px] truncate">Contenido</th>
+                            <th className="border text-teal-400 p-2 text-left">Fecha</th>
+                            <th className="border text-teal-400 p-2 text-left">Imagen</th>
+                            <th className="border text-teal-400 p-2 text-left">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>

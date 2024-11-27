@@ -59,11 +59,11 @@ public class CitaResource {
     }
 
     @PUT
-    @Path("/{citaId}/confirmar")
+    @Path("/{idCita}/confirmar")
     @Transactional
-    public Response confirmarCita(@PathParam("citaId") Long citaId) {
+    public Response confirmarCita(@PathParam("idCita") Long idCita) {
         // Busca la cita por ID
-        Cita cita = Cita.findById(citaId);
+        Cita cita = Cita.findById(idCita);
 
         if (cita == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("Cita no encontrada").build();
@@ -75,11 +75,11 @@ public class CitaResource {
     }
 
     @PUT
-    @Path("/{citaId}/anular")
+    @Path("/{idCita}/anular")
     @Transactional
-    public Response anularCita(@PathParam("citaId") Long citaId) {
+    public Response anularCita(@PathParam("idCita") Long idCita) {
         // Busca la cita por ID
-        Cita cita = Cita.findById(citaId);
+        Cita cita = Cita.findById(idCita);
 
         if (cita == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("Cita no encontrada").build();

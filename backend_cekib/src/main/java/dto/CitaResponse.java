@@ -5,7 +5,7 @@ import entities.Cita;
 import java.time.LocalDateTime;
 
 public class CitaResponse {
-    private Long id;
+    private Long idCita;
     private LocalDateTime fechaCita;
     private String estadoCita;
     private String rutPaciente;
@@ -20,7 +20,7 @@ public class CitaResponse {
 
     // Constructor que recibe una entidad Cita
     public CitaResponse(Cita cita) {
-        this.id = cita.id;
+        this.idCita = cita.getIdCita();
         this.fechaCita = cita.getFechaCita();
         this.estadoCita = cita.getEstadoCita();
         this.rutPaciente = cita.getPaciente().getRutPac();
@@ -31,12 +31,12 @@ public class CitaResponse {
     }
 
     // Getters y Setters
-    public Long getId() {
-        return id;
+    public Long getIdCita() {
+        return idCita;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdCita(Long idCita) {
+        this.idCita = idCita;
     }
 
     public LocalDateTime getFechaCita() {

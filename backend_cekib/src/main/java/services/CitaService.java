@@ -60,7 +60,7 @@ public class CitaService {
         List<Cita> citas = Cita.listAll();
         return citas.stream().map(cita -> {
             CitaResponse response = new CitaResponse();
-            response.setId(cita.id);
+            response.setIdCita(cita.getIdCita());
             response.setFechaCita(cita.getFechaCita());
             response.setEstadoCita(cita.getEstadoCita());
             response.setRutPaciente(cita.getPaciente().getRutPac());
