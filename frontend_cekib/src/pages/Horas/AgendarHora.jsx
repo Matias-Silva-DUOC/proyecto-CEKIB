@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 import { NavbarHoras } from "../../components/Horas/NavBarHoras";
 import { Footer } from "../../components/Horas/Footer";
 import { Button, Input } from "@material-tailwind/react";
@@ -41,6 +42,7 @@ export default function AgendarHora() {
         telefono: "",
         correo: "",
     });
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -55,13 +57,13 @@ export default function AgendarHora() {
             alert("Por favor completa todos los campos.");
             return;
         }
-    
+
         // Validar que citaAgendada tenga el formato correcto
         if (!citaAgendada?.citaAgendadaISO) {
             alert("Por favor selecciona una fecha y hora válidas.");
             return;
         }
-    
+
         const payload = {
             rutPaciente: rutPac,
             tipoTratamiento,
@@ -72,17 +74,17 @@ export default function AgendarHora() {
             telefonoPaciente: formData.telefono,
             correoPaciente: formData.correo,
         };
-    
+
         try {
             const response = await axios.post('http://localhost:8080/citas', payload, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
-    
+
             if (response.status === 201) {
                 alert("¡Reserva confirmada con éxito!");
-                setActiveStep(1); // Reiniciar el flujo de pasos si es necesario
+                setActiveStep(activeStep + 1); // Avanzar al siguiente paso
             } else {
                 alert("Hubo un problema al confirmar la reserva. Por favor, inténtalo de nuevo.");
             }
@@ -91,7 +93,7 @@ export default function AgendarHora() {
             alert("Ocurrió un error al intentar guardar la reserva. Revisa la consola para más detalles.");
         }
     };
-    
+
 
     useEffect(() => {
         const fetchProfesionales = async () => {
@@ -487,6 +489,24 @@ export default function AgendarHora() {
                         </div>
                     </div>
                 )
+            case 6:
+                return (
+                    <div>
+                        <div className="w-1/2 text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <h3 className="text-teal-400 text-xl font-bold mb-12">
+                                ¡Tu reserva de hora ha sido agendada!
+                            </h3>
+                            <Button
+                                color="teal"
+                                className="bg-teal-400 text-white rounded"
+                                onClick={() => navigate('/home')} // Redirige a la página principal
+                            >
+                                VOLVER A LA PÁGINA PRINCIPAL
+                            </Button>
+
+                        </div>
+                    </div>
+                );
         }
     };
 

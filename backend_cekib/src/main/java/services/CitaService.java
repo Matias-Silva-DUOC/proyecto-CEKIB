@@ -4,9 +4,11 @@ import entities.Cita;
 import entities.Paciente;
 import entities.Profesional;
 import dto.CitaRequest;
+import dto.CitaResponse;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
@@ -46,5 +48,21 @@ public class CitaService {
         cita.setPaciente(paciente);
         cita.setProfesional(profesional);
         cita.persist();
+    }
+
+    public List<CitaResponse> obtenerTodasLasCitas() {
+        List<Cita> citas = Cita.listAll();
+        return citas.stream().map(cita -> {
+            CitaResponse response = new CitaResponse();
+            response.setId(cita.id);
+            response.setFechaCita(cita.getFechaCita());
+            response.setEstadoCita(cita.getEstadoCita());
+            response.setRutPaciente(cita.getPaciente().getRutPac());
+            response.setNombrePaciente(cita.getPaciente().getNombrePac());
+            response.setApellidoPaciente(cita.getPaciente().getApellidoPac());
+            response.setRutProfesional(cita.getProfesional().getRutPro());
+            response.setNombreProfesional(cita.getProfesional().getNombrePro());
+            return response;
+        }).toList();
     }
 }

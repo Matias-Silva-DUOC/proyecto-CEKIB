@@ -11,6 +11,7 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
   const [infoProfesional, setInfoProfesional] = useState(null);
   const [diasDisponibles, setDiasDisponibles] = useState([]);
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
+  const [citasProfesional, setCitasProfesional] = useState([]);
 
   useEffect(() => {
     const fetchInfoProfesional = async () => {
@@ -21,7 +22,6 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
         setInfoProfesional(response.data);
 
         if (response.data.horario) {
-          // Definir el mapeo de días de la semana dentro del ámbito correcto
           const diasSemana = {
             Lunes: 1,
             Martes: 2,
@@ -32,13 +32,11 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
             Domingo: 0,
           };
 
-          // Procesar días disponibles
           const dias = Object.keys(response.data.horario)
             .map((dia) => diasSemana[dia] ?? null)
             .filter((dia) => dia !== null);
           setDiasDisponibles(dias);
 
-          // Generar horarios dinámicos para el día seleccionado
           if (fechaSeleccionada) {
             const diaSemana = fechaSeleccionada.getDay();
             const diaNombre = Object.keys(response.data.horario).find(
@@ -46,7 +44,8 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
             );
             if (diaNombre) {
               const { inicio, fin } = response.data.horario[diaNombre];
-              setHorariosDisponibles(generarHorarios(inicio, fin));
+              const horarios = generarHorarios(inicio, fin);
+              setHorariosDisponibles(horarios);
             } else {
               setHorariosDisponibles([]);
             }
@@ -64,29 +63,26 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
     }
   }, [rutProfesional, fechaSeleccionada]);
 
-  const confirmarCita = () => {
-    if (fechaSeleccionada && horaSeleccionada) {
-        const citaAgendadaISO = new Date(
-            `${fechaSeleccionada.toISOString().split("T")[0]}T${horaSeleccionada}:00`
-        ).toISOString();
+  useEffect(() => {
+    const fetchCitasProfesional = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/citas");
+        const citas = response.data.filter(
+          (cita) =>
+            cita.rutProfesional === rutProfesional &&
+            new Date(cita.fechaCita).toLocaleDateString("es-ES") ===
+            fechaSeleccionada?.toLocaleDateString("es-ES")
+        );
+        setCitasProfesional(citas);
+      } catch (error) {
+        console.error("Error al obtener las citas del profesional:", error);
+      }
+    };
 
-        const nuevaCita = {
-            fecha: fechaSeleccionada.toLocaleDateString("es-ES"),
-            hora: horaSeleccionada,
-        };
-
-        setCitaAgendada({
-            citaAgendadaISO, // Agregar este valor formateado
-            ...nuevaCita,
-        });
-
-        // Avanza al siguiente paso
-        setActiveStep((prevStep) => prevStep + 1);
-    } else {
-        alert("Por favor selecciona una fecha y un horario.");
+    if (fechaSeleccionada) {
+      fetchCitasProfesional();
     }
-};
-
+  }, [rutProfesional, fechaSeleccionada]);
 
   const generarHorarios = (inicio, fin) => {
     const horarios = [];
@@ -99,6 +95,50 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
     }
 
     return horarios;
+  };
+
+  const estaHorarioOcupado = (horario) => {
+    return citasProfesional.some((cita) => {
+      const citaFecha = new Date(cita.fechaCita); // Fecha original del backend
+  
+      // Restar 3 horas a la fecha y hora de la cita
+      citaFecha.setHours(citaFecha.getHours());
+  
+      const citaHoraLocal = citaFecha
+        .getHours()
+        .toString()
+        .padStart(2, "0") + ":00"; // Hora ajustada (restadas 3 horas)
+  
+      // Comparar la fecha seleccionada y la hora seleccionada con la hora ajustada
+      return (
+        citaFecha.toLocaleDateString("es-ES") ===
+          fechaSeleccionada?.toLocaleDateString("es-ES") &&
+        citaHoraLocal === horario
+      );
+    });
+  };
+  
+
+  const confirmarCita = () => {
+    if (fechaSeleccionada && horaSeleccionada) {
+      const citaAgendadaISO = new Date(
+        `${fechaSeleccionada.toISOString().split("T")[0]}T${horaSeleccionada}:00`
+      ).toISOString();
+
+      const nuevaCita = {
+        fecha: fechaSeleccionada.toLocaleDateString("es-ES"),
+        hora: horaSeleccionada,
+      };
+
+      setCitaAgendada({
+        citaAgendadaISO,
+        ...nuevaCita,
+      });
+
+      setActiveStep((prevStep) => prevStep + 1);
+    } else {
+      alert("Por favor selecciona una fecha y un horario.");
+    }
   };
 
   const diasDeshabilitados = [
@@ -118,19 +158,6 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
             disabled={diasDeshabilitados}
             locale={es}
             className="bg-white p-1"
-            styles={{
-              day: { fontSize: "0.6rem" },
-              head: { fontSize: "0.6rem" },
-              caption: { fontSize: "0.65rem", marginBottom: 0 },
-              navButton: { fontSize: "0.65rem" },
-              caption_label: { fontSize: "0.65rem" },
-            }}
-            modifiersClassNames={{
-              selected: "bg-teal-400 text-white font-bold border-teal-800 rounded-lg",
-              today: "text-deep-purple-600 font-bold",
-              disabled:
-                "line-through bg-gray-300 text-gray-500 border-4 border-white rounded-lg",
-            }}
           />
         </div>
 
@@ -145,9 +172,12 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
                     <button
                       key={horario}
                       onClick={() => setHoraSeleccionada(horario)}
-                      className={`px-3 py-1 rounded-md ${horaSeleccionada === horario
-                        ? "bg-teal-500 text-white"
-                        : "bg-gray-200 hover:bg-gray-300"
+                      disabled={estaHorarioOcupado(horario)} // Bloqueo de horarios ocupados
+                      className={`px-3 py-1 rounded-md ${estaHorarioOcupado(horario)
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : horaSeleccionada === horario
+                            ? "bg-teal-500 text-white"
+                            : "bg-gray-200 hover:bg-gray-300"
                         }`}
                     >
                       {horario}
@@ -159,7 +189,6 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
                   </p>
                 )}
               </div>
-
               {horaSeleccionada && (
                 <p className="my-2 text-sm">
                   Cita seleccionada:{" "}
@@ -167,12 +196,11 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
                   <strong className="text-deep-purple-300">{horaSeleccionada}</strong>
                 </p>
               )}
-
               <div className="flex justify-end m-2">
                 <Button
                   color="teal"
-                  className="bg-white text-teal-400 border border-teal-400 px-4 py-2 rounded-md hover:bg-teal-400 hover:text-white"
                   onClick={confirmarCita}
+                  className="bg-white text-teal-400 border border-teal-400 px-4 py-2 rounded-md hover:bg-teal-400 hover:text-white"
                 >
                   CONFIRMAR
                 </Button>
@@ -184,8 +212,8 @@ export default function AgendarCita({ rutProfesional, setActiveStep, setCitaAgen
             </p>
           )}
         </div>
-
       </div>
     </div>
   );
 }
+
