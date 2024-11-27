@@ -17,8 +17,6 @@ export function NavbarHoras() {
       ? "Confirmar Hora"
       : location.pathname === "/anularhora"
       ? "Anular Hora"
-      : location.pathname === "/cambiarhora"
-      ? "Cambiar Hora"
       : "Agendar Hora";
 
   React.useEffect(() => {
@@ -38,7 +36,6 @@ export function NavbarHoras() {
         { name: "Consultar Hora", path: "/consultarhora" },
         { name: "Confirmar Hora", path: "/confirmarhora" },
         { name: "Anular Hora", path: "/anularhora" },
-        { name: "Cambiar Hora", path: "/cambiarhora" },
       ].map(({ name, path }) => (
         <li
           key={name}

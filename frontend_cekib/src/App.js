@@ -10,7 +10,6 @@ import AgendarHora from './pages/Horas/AgendarHora';
 import ConsultarHora from './pages/Horas/ConsultarHora';
 import ConfirmarHora from './pages/Horas/ConfirmarHora';
 import AnularHora from './pages/Horas/AnularHora';
-import CambiarHora from './pages/Horas/CambiarHora';
 import Login from './pages/Login';
 import HomeAdmin from './pages/Admin/HomeAdmin';
 import Dashboard from './pages/Admin/Dashboard';
@@ -39,7 +38,6 @@ function App() {
         <Route path='/consultarhora' element={<ConsultarHora />} />
         <Route path='/confirmarhora' element={<ConfirmarHora />} />
         <Route path='/anularhora' element={<AnularHora />} />
-        <Route path='/cambiarhora' element={<CambiarHora />} />
 
         {/* Login Route */}
         <Route path='/login' element={<Login />} />

@@ -257,7 +257,7 @@ export default function AgendarHora() {
                         </p>
                         <div className="w-full mx-auto mb-2 px-8">
                             <Input
-                                color={rutValido === null ? "teal" : rutValido ? "green" : "red"}
+                                color={rutValido === null ? "deep-purple" : rutValido ? "green" : "red"}
                                 label="RUT del Paciente"
                                 value={rut}
                                 onChange={handleRutChange}

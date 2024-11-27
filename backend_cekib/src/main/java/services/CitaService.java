@@ -5,15 +5,21 @@ import entities.Paciente;
 import entities.Profesional;
 import dto.CitaRequest;
 import dto.CitaResponse;
+import repositories.CitaRepository;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CitaService {
 
+    @Inject
+    CitaRepository citaRepository; // Inyección del repositorio
+    
     @Transactional
     public void guardarCita(CitaRequest request) {
         // Verificar si el paciente existe
@@ -65,4 +71,14 @@ public class CitaService {
             return response;
         }).toList();
     }
+
+    public List<CitaResponse> obtenerCitasPorRutPaciente(String rutPaciente) {
+    // Implementación para obtener citas desde el repositorio
+    return citaRepository.findByRutPaciente(rutPaciente)
+            .stream()
+            .map(cita -> new CitaResponse(cita)) // Mapea las citas al DTO de respuesta
+            .collect(Collectors.toList());
+}
+
+    
 }
