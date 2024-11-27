@@ -63,7 +63,7 @@ const BlogPost = () => {
             <div className="mt-28">
                 <ContactInfo />
                 <div className="p-6 bg-gray-100 min-h-screen">
-                    <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div className="max-w-4xl mx-auto bg-white rounded-lg border border-teal-400 overflow-hidden">
                         {/* Imagen destacada */}
                         {post.imagePath && (
                             <img
@@ -73,7 +73,7 @@ const BlogPost = () => {
                             />
                         )}
                         <div className="p-6">
-                            <h1 className="text-4xl font-bold mb-4 text-gray-800">{post.titulo}</h1>
+                            <h1 className="text-2xl text-deep-purple-300 font-bold text-center mb-6">{post.titulo}</h1>
                             <p className="text-sm text-gray-500 mb-6">
                                 Publicado el: {new Date(post.fecha_blog).toLocaleDateString()}
                             </p>

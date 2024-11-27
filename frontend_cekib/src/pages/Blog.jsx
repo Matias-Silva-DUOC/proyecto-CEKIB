@@ -31,7 +31,7 @@ const Blog = () => {
             <div className="mt-28">
                 <ContactInfo />
                 <div className="blog-page p-6">
-                    <h1 className="text-4xl font-bold text-center mb-6">Listado de Blogs</h1>
+                    <h1 className="text-2xl text-deep-purple-300 font-bold text-center mb-6">¡Revisa nuestros Blogs!</h1>
                     {loading ? (
                         <p className="text-center text-gray-500">Cargando publicaciones...</p>
                     ) : error ? (
@@ -43,7 +43,7 @@ const Blog = () => {
                         {posts.map((post) => (
                             <div
                                 key={post.id_blog}
-                                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                                className="bg-white shadow-md rounded-lg border border-teal-400 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                                 onClick={() => navigate(`/blog/${post.id_blog}`)}
                             >
                                 {post.imagePath && (
