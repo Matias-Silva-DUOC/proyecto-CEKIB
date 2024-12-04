@@ -7,6 +7,10 @@ export default function HomeMedico() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profesional, setProfesional] = useState(null); // Estado para guardar los datos del profesional
     const [currentIdUsuario, setCurrentIdUsuario] = useState(null); // Estado para guardar el idUsuario actual
+    const [citas, setCitas] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [recordatorios, setRecordatorios] = useState([]); // Estado para los recordatorios
+    const [nuevoRecordatorio, setNuevoRecordatorio] = useState(""); // Estado para el nuevo recordatorio
     const location = useLocation();
     const { idUsuario } = location.state || {}; // Accede al idUsuario desde el estado
 
@@ -27,6 +31,7 @@ export default function HomeMedico() {
                 // Filtrar el profesional según el currentIdUsuario
                 const profesionalFiltrado = profesionales.find((pro) => pro.idUsuario === currentIdUsuario);
                 setProfesional(profesionalFiltrado);
+                setRecordatorios(profesionalFiltrado?.recordatorios || []);
             } catch (error) {
                 console.error("Error al obtener los datos del profesional:", error);
             }
@@ -36,6 +41,47 @@ export default function HomeMedico() {
             fetchProfesional();
         }
     }, [currentIdUsuario]);
+
+    // Manejar la creación de un nuevo recordatorio
+    const handleCrearRecordatorio = () => {
+        if (nuevoRecordatorio.trim() === "") return;
+        const nuevo = {
+            id: Date.now(),
+            texto: nuevoRecordatorio,
+        };
+        setRecordatorios([...recordatorios, nuevo]);
+        setNuevoRecordatorio("");
+    };
+
+    // Manejar la eliminación de un recordatorio
+    const handleEliminarRecordatorio = (id) => {
+        setRecordatorios(recordatorios.filter((rec) => rec.id !== id));
+    };
+
+    // Manejar la edición de un recordatorio
+    const handleEditarRecordatorio = (id, nuevoTexto) => {
+        setRecordatorios(
+            recordatorios.map((rec) => (rec.id === id ? { ...rec, texto: nuevoTexto } : rec))
+        );
+    };
+
+    useEffect(() => {
+        // Llamada a la API para obtener las citas
+        fetch('http://localhost:8080/citas')
+            .then((response) => response.json())
+            .then((data) => {
+                // Filtrar citas por rutProfesional
+                const citasFiltradas = data.filter(
+                    (cita) => cita.rutProfesional === '18325499-5'
+                );
+                setCitas(citasFiltradas);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error al cargar las citas:', error);
+                setIsLoading(false);
+            });
+    }, []);
 
     return (
         <main>
@@ -53,47 +99,70 @@ export default function HomeMedico() {
                             <p className="text-gray-600">Aquí está un resumen de tu día y recordatorios importantes.</p>
                         </div>
 
-                        {/* Pacientes del Día */}
+                        {/* Próximos pacientes */}
                         <div className="border-t pt-4 space-y-3">
-                            <h3 className="font-semibold text-teal-500">Pacientes de la semana</h3>
-                            <ul className="space-y-2">
-                                {[...Array(3)].map((_, idx) => (
-                                    <li key={idx} className="flex justify-between items-center">
-                                        <span className="text-gray-700">Paciente {idx + 1}</span>
-                                        <button className="text-sm text-teal-600 hover:underline">Ver Consulta</button>
-                                    </li>
-                                ))}
-                            </ul>
+                            <h3 className="font-semibold text-teal-500">Próximas citas</h3>
+                            <table border="1" style={{ width: '100%', textAlign: 'left' }}>
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Rut Paciente</th>
+                                        <th>Fecha</th>
+                                        <th>Hora</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {citas.map((cita) => (
+                                        <tr key={cita.idCita}>
+                                            <td>{`${cita.nombrePaciente} ${cita.apellidoPaciente}`}</td>
+                                            <td>{cita.rutPaciente}</td>
+                                            <td>{new Date(cita.fechaCita).toLocaleDateString()}</td>
+                                            <td>{new Date(cita.fechaCita).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                                            <td>{cita.estadoCita}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
 
-                        {/* Recordatorios */}
+                        {/* Gestión de recordatorios */}
                         <div className="border-t pt-4">
-                            <h3 className="font-semibold text-teal-500">Recordatorios</h3>
-                            <ul className="space-y-2">
-                                {profesional ? (
-                                    <li className="text-gray-700">{profesional.recordatorio}</li>
-                                ) : (
-                                    <li className="text-gray-700">Cargando recordatorios...</li>
-                                )}
-                            </ul>
-                        </div>
-
-                        {/* Estadísticas de la Semana */}
-                        <div className="border-t pt-4">
-                            <h3 className="font-semibold text-teal-500">Estadísticas de la Semana</h3>
-                            <div className="flex justify-around text-teal-600">
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold">15</p>
-                                    <p>Consultas</p>
+                            <h3 className="font-semibold text-teal-500">Gestión de Recordatorios</h3>
+                            <div className="space-y-3">
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder="Nuevo recordatorio"
+                                        value={nuevoRecordatorio}
+                                        onChange={(e) => setNuevoRecordatorio(e.target.value)}
+                                        className="border p-2 rounded w-full"
+                                    />
+                                    <button
+                                        onClick={handleCrearRecordatorio}
+                                        className="mt-2 bg-teal-500 text-white px-4 py-2 rounded"
+                                    >
+                                        Crear Recordatorio
+                                    </button>
                                 </div>
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold">5</p>
-                                    <p>Tratamientos Iniciados</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold">8</p>
-                                    <p>Fichas Actualizadas</p>
-                                </div>
+                                <ul className="space-y-2">
+                                    {recordatorios.map((rec) => (
+                                        <li key={rec.id} className="flex justify-between items-center border p-2 rounded">
+                                            <input
+                                                type="text"
+                                                value={rec.texto}
+                                                onChange={(e) => handleEditarRecordatorio(rec.id, e.target.value)}
+                                                className="flex-grow border-none"
+                                            />
+                                            <button
+                                                onClick={() => handleEliminarRecordatorio(rec.id)}
+                                                className="ml-2 bg-red-500 text-white px-4 py-2 rounded"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         </div>
                     </div>

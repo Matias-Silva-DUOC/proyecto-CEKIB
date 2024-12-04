@@ -44,12 +44,16 @@ public class Profesional extends PanacheEntityBase {
     @Column(name = "tipo_usuario", nullable = false, length = 64)
     private String tipoUsuario;
 
-    @Column(name = "id_usuario")
+    @Column(name = "id_usuario", insertable = false, updatable = false)
     private Integer idUsuario;
 
     @OneToMany(mappedBy = "profesional", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Cita> citas = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", unique = true)
+    private Usuario usuario;
 
     // Constructor vacío
     public Profesional() {
@@ -122,7 +126,7 @@ public class Profesional extends PanacheEntityBase {
     public JsonNode getHorario() {
         return horario;
     }
-    
+
     public void setHorario(JsonNode horario) {
         this.horario = horario;
     }
@@ -130,7 +134,7 @@ public class Profesional extends PanacheEntityBase {
     public String getRecordatorio() {
         return recordatorio;
     }
-    
+
     public void setRecordatorio(String recordatorio) {
         this.recordatorio = recordatorio;
     }
@@ -138,7 +142,7 @@ public class Profesional extends PanacheEntityBase {
     public String getTipoUsuario() {
         return tipoUsuario;
     }
-    
+
     public void setTipoUsuario(String tipoUsuario) {
         this.tipoUsuario = tipoUsuario;
     }
@@ -146,7 +150,7 @@ public class Profesional extends PanacheEntityBase {
     public Integer getIdUsuario() {
         return idUsuario;
     }
-    
+
     public void setIdUsuario(Integer idUsuario) {
         this.idUsuario = idUsuario;
     }
@@ -157,5 +161,13 @@ public class Profesional extends PanacheEntityBase {
 
     public void setCitas(List<Cita> citas) {
         this.citas = citas;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }

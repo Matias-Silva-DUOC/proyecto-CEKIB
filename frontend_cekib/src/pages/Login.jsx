@@ -28,9 +28,9 @@ export default function Login() {
                 if (user) {
                     // Redirigir según el tipo de usuario
                     if (user.tipoUsuario === "administrador") {
-                        navigate("/homeadmin");
+                        navigate("/dashboard");
                     } else if (user.tipoUsuario === "profesional") {
-                        navigate("/dashboard", { state: { idUsuario: user.idUsuario } });
+                        navigate("/homemedico", { state: { idUsuario: user.idUsuario } });
                     }
                 } else {
                     alert("Usuario o contraseña incorrectos");
